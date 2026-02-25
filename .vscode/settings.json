@@ -13,6 +13,7 @@
     "gofumpt",
     "goheader",
     "goimports",
+    "golangci",
     "golines",
     "gomod",
     "gosec",
