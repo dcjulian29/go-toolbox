@@ -13,14 +13,14 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package exec
+package execute
 
 import (
 	"os"
 	"os/exec"
 )
 
-func ExecuteExternalProgram(program string, params ...string) error {
+func ExternalProgram(program string, params ...string) error {
 	cmd := exec.Command(program, params...)
 	cmd.Stderr = os.Stderr
 	cmd.Stdin = os.Stdin
