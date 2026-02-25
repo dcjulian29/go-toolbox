@@ -16,16 +16,17 @@ limitations under the License.
 package vagrant
 
 import (
-	"fmt"
-	"os"
+	"errors"
 
-	"github.com/dcjulian29/go-toolbox/color"
 	"github.com/dcjulian29/go-toolbox/io"
 )
 
-func EnsureVagrantfile() {
+const CODE = 1
+
+func EnsureVagrantfile() error {
 	if !io.FileExists("Vagrantfile") {
-		fmt.Println(color.Fatal("can't find the Vagrantfile"))
-		os.Exit(1)
+		return errors.New("can't find the Vagrantfile")
 	}
+
+	return nil
 }

@@ -17,15 +17,18 @@ package io
 
 import (
 	"crypto/sha256"
-	"fmt"
+	"encoding/hex"
 	"io"
 	"os"
 	"path/filepath"
 	"strings"
 )
 
-func FileExists(filename string) bool {
-	info, err := os.Stat(filename)
+const FileModeExecutable = 0755
+
+func FileExists(path string) bool {
+	info, err := os.Stat(path)
+
 	if os.IsNotExist(err) {
 		return false
 	}
@@ -35,6 +38,7 @@ func FileExists(filename string) bool {
 
 func DirectoryExists(path string) bool {
 	info, err := os.Stat(path)
+
 	if os.IsNotExist(err) {
 		return false
 	}
@@ -42,9 +46,9 @@ func DirectoryExists(path string) bool {
 	return info.IsDir()
 }
 
-func EnsureDirectoryExist(dirPath string) error {
-	if _, err := os.Stat(dirPath); os.IsNotExist(err) {
-		if err := os.MkdirAll(dirPath, 0755); err != nil {
+func EnsureDirectoryExist(path string) error {
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		if err := os.MkdirAll(path, FileModeExecutable); err != nil {
 			return err
 		}
 	}
@@ -52,9 +56,9 @@ func EnsureDirectoryExist(dirPath string) error {
 	return nil
 }
 
-func RemoveDirectory(dirPath string) error {
-	if DirectoryExists(dirPath) {
-		files, err := filepath.Glob(filepath.Join(dirPath, "*"))
+func RemoveDirectory(path string) error {
+	if DirectoryExists(path) {
+		files, err := filepath.Glob(filepath.Join(path, "*"))
 		if err != nil {
 			return err
 		}
@@ -66,24 +70,24 @@ func RemoveDirectory(dirPath string) error {
 			}
 		}
 
-		return os.Remove(dirPath)
+		return os.Remove(path)
 	}
 
 	return nil
 }
 
-func RemoveFile(filePath string) error {
-	if FileExists(filePath) {
-		return os.Remove(filePath)
+func RemoveFile(path string) error {
+	if FileExists(path) {
+		return os.Remove(path)
 	}
 
 	return nil
 }
 
-func FileHash(filePath string) (string, error) {
+func FileHash(path string) (string, error) {
 	hash := sha256.New()
 
-	sourceFile, err := os.Open(filePath)
+	sourceFile, err := os.Open(path)
 	if err != nil {
 		return "", err
 	}
@@ -96,14 +100,18 @@ func FileHash(filePath string) (string, error) {
 		return "", err
 	}
 
-	return fmt.Sprintf("%x", hash.Sum(nil)), nil
+	return hex.EncodeToString(hash.Sum(nil)), nil
 }
 
-func ScanDirectory(dir_path string, ignore []string) ([]string, []string, error) {
+func ScanDirectory(path string, ignore []string) ([]string, []string, error) {
 	folders := []string{}
 	files := []string{}
 
-	err := filepath.Walk(dir_path, func(path string, f os.FileInfo, err error) error {
+	err := filepath.Walk(path, func(path string, f os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
 		_continue := false
 
 		for _, i := range ignore {
@@ -113,16 +121,11 @@ func ScanDirectory(dir_path string, ignore []string) ([]string, []string, error)
 		}
 
 		if !_continue {
-			s, err := os.Stat(path)
-			if err != nil {
-				return err
-			}
+			m := f.Mode()
 
-			f_mode := s.Mode()
-
-			if f_mode.IsDir() {
+			if m.IsDir() {
 				folders = append(folders, path)
-			} else if f_mode.IsRegular() {
+			} else if m.IsRegular() {
 				files = append(files, path)
 			}
 		}
