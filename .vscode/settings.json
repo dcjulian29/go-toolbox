@@ -1,7 +1,26 @@
 {
   "cSpell.words": [
+    "bidichk",
+    "cyclop",
     "dcjulian",
+    "dupl",
+    "errorf",
+    "exptostd",
+    "gochecknoglobals",
+    "gochecknoinits",
+    "gocyclo",
+    "gofmt",
+    "gofumpt",
+    "goheader",
+    "goimports",
+    "golines",
     "gomod",
-    "nolint"
+    "gosec",
+    "govet",
+    "iface",
+    "nlreturn",
+    "nolint",
+    "perfsprint",
+    "unconvert"
   ]
 }

@@ -1,0 +1,93 @@
+version: "2"
+
+issues:
+  max-issues-per-linter: 0
+  max-same-issues: 0
+
+linters:
+  enable:
+    - asciicheck
+    - bidichk
+    - copyloopvar
+    - cyclop
+    - decorder
+    - dupl
+    - durationcheck
+    - errcheck
+    - errorlint
+    - exptostd
+    - funlen
+    - gochecknoglobals
+    - gochecknoinits # Only for library code
+    - gocyclo
+    - gosec
+    - govet
+    - iface
+    - intrange
+    - lll
+    - misspell
+    - modernize
+    - nlreturn
+    - perfsprint
+    - predeclared
+    - revive
+    - staticcheck
+    - unconvert
+    - unused
+    - usestdlibvars
+    - wastedassign
+    - whitespace
+  exclusions:
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    rules:
+      - linters:
+          - errcheck
+          - dupl
+          - gocyclo
+          - gosec
+        path: _test.go
+  settings:
+    decorder:
+      dec-order:
+        - type
+        - const
+        - var
+        - func
+      disable-init-func-first-check: false
+      disable-dec-order-check: false
+      disable-dec-num-check: false
+    gocyclo:
+      min-complexity: 15
+    govet:
+      enable-all: true
+    lll:
+      line-length: 120
+    perfsprint:
+      err-error: true
+      errorf: true
+    revive:
+      enable-all-rules: true
+      rules:
+        - name: cognitive-complexity
+          arguments:
+            - 15
+        - name: confusing-results
+          disabled: true
+        - name: line-length-limit
+          arguments:
+            - 120
+        - name: var-naming
+          arguments:
+            - []
+            - []
+            - - skip-package-name-collision-with-go-std: true
+    whitespace:
+      multi-if: true
+      multi-func: true
+
+run:
+  relative-path-mode: gitroot
