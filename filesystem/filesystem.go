@@ -56,6 +56,21 @@ func EnsureDirectoryExist(path string) error {
 	return nil
 }
 
+func EnsureFileExist(path string, content []byte) error {
+	file, err := os.Create(path)
+	if err != nil {
+		return err
+	}
+
+	defer file.Close()
+
+	if _, err = file.Write(content); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func RemoveDirectory(path string) error {
 	if DirectoryExists(path) {
 		files, err := filepath.Glob(filepath.Join(path, "*"))
