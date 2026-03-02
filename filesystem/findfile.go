@@ -22,11 +22,13 @@ import (
 	"path/filepath"
 )
 
+const EmptyString = ""
+
 func FindFile(filename string) (string, error) {
 	pwd, _ := os.Getwd()
 	absStart, err := filepath.Abs(pwd)
 	if err != nil {
-		return "", fmt.Errorf("failed to resolve current directory: %w", err)
+		return EmptyString, fmt.Errorf("failed to resolve current directory: %w", err)
 	}
 
 	if found, err := searchChildren(filename, absStart); err == nil {
@@ -37,7 +39,7 @@ func FindFile(filename string) (string, error) {
 		return found, nil
 	}
 
-	return "", fmt.Errorf("failed to find '%s' in any child or parent directory", filename)
+	return EmptyString, fmt.Errorf("failed to find '%s' in any child or parent directory", filename)
 }
 
 func searchChildren(filename, dir string) (string, error) {
@@ -60,7 +62,7 @@ func searchChildren(filename, dir string) (string, error) {
 		}
 	}
 
-	return "", fmt.Errorf("file %q not found in children of %s", filename, dir)
+	return EmptyString, fmt.Errorf("file %q not found in children of %s", filename, dir)
 }
 
 func searchParents(filename, dir string) (string, error) {
@@ -76,7 +78,7 @@ func searchParents(filename, dir string) (string, error) {
 		parent := filepath.Dir(current)
 
 		if parent == current {
-			return "", errors.New("file not found: no more parent directories to search")
+			return EmptyString, errors.New("file not found: no more parent directories to search")
 		}
 
 		current = parent
