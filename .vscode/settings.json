@@ -19,6 +19,7 @@
     "gosec",
     "govet",
     "iface",
+    "ncipollo",
     "nlreturn",
     "nolint",
     "perfsprint",

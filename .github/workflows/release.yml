@@ -1,0 +1,23 @@
+---
+name: Release
+
+'on':
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - run: git fetch --force --tags
+
+      - uses: ncipollo/release-action@v1
+        with:
+          generateReleaseNotes: true
+          generateReleaseNotesPreviousTag: true
