@@ -24,7 +24,7 @@ import (
 
 const EmptyString = ""
 
-func FindFile(filename string) (string, error) {
+func FindFile(filename string, searchUp bool) (string, error) {
 	pwd, _ := os.Getwd()
 	absStart, err := filepath.Abs(pwd)
 	if err != nil {
@@ -35,11 +35,13 @@ func FindFile(filename string) (string, error) {
 		return found, nil
 	}
 
-	if found, err := searchParents(filename, absStart); err == nil {
-		return found, nil
+	if searchUp {
+		if found, err := searchParents(filename, absStart); err == nil {
+			return found, nil
+		}
 	}
 
-	return EmptyString, fmt.Errorf("failed to find '%s' in any child or parent directory", filename)
+	return EmptyString, fmt.Errorf("failed to find '%s'", filename)
 }
 
 func searchChildren(filename, dir string) (string, error) {
