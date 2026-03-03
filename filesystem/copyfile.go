@@ -22,33 +22,33 @@ import (
 )
 
 func CopyFile(src, dst string) error {
-	if FileExists(src) {
-		if FileExists(dst) {
-			if err := os.Remove(dst); err != nil {
-				return err
-			}
-		}
-
-		source, err := os.Open(src)
-		if err != nil {
-			return err
-		}
-
-		defer source.Close()
-
-		destination, err := os.Create(dst)
-		if err != nil {
-			return err
-		}
-
-		defer destination.Close()
-
-		_, err = io.Copy(destination, source)
-		if err != nil {
-			return err
-		}
-	} else {
+	if !FileExists(src) {
 		return fmt.Errorf("source file '%s' does not exists", src)
+	}
+
+	if FileExists(dst) {
+		if err := os.Remove(dst); err != nil {
+			return err
+		}
+	}
+
+	source, err := os.Open(src)
+	if err != nil {
+		return err
+	}
+
+	defer source.Close()
+
+	destination, err := os.Create(dst)
+	if err != nil {
+		return err
+	}
+
+	defer destination.Close()
+
+	_, err = io.Copy(destination, source)
+	if err != nil {
+		return err
 	}
 
 	return nil
