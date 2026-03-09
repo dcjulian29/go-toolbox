@@ -15,4 +15,16 @@ limitations under the License.
 */
 package filesystem
 
-const FileModeExecutable = 0755
+import (
+	"os"
+)
+
+func EnsureDirectoryExist(path string) error {
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		if err := os.MkdirAll(path, FileModeExecutable); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}

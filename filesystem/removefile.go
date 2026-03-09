@@ -15,4 +15,14 @@ limitations under the License.
 */
 package filesystem
 
-const FileModeExecutable = 0755
+import (
+	"os"
+)
+
+func RemoveFile(path string) error {
+	if FileExists(path) {
+		return os.Remove(path)
+	}
+
+	return nil
+}

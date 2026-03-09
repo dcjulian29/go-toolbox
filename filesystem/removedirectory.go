@@ -15,4 +15,27 @@ limitations under the License.
 */
 package filesystem
 
-const FileModeExecutable = 0755
+import (
+	"os"
+	"path/filepath"
+)
+
+func RemoveDirectory(path string) error {
+	if DirectoryExists(path) {
+		files, err := filepath.Glob(filepath.Join(path, "*"))
+		if err != nil {
+			return err
+		}
+
+		for _, file := range files {
+			err := os.RemoveAll(file)
+			if err != nil {
+				return err
+			}
+		}
+
+		return os.Remove(path)
+	}
+
+	return nil
+}

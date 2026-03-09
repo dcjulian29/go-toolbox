@@ -15,4 +15,19 @@ limitations under the License.
 */
 package filesystem
 
-const FileModeExecutable = 0755
+import "os"
+
+func EnsureFileExist(path string, content []byte) error {
+	file, err := os.Create(path)
+	if err != nil {
+		return err
+	}
+
+	defer file.Close()
+
+	if _, err = file.Write(content); err != nil {
+		return err
+	}
+
+	return nil
+}

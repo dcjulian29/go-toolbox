@@ -15,4 +15,16 @@ limitations under the License.
 */
 package filesystem
 
-const FileModeExecutable = 0755
+import (
+	"os"
+)
+
+func DirectoryExists(path string) bool {
+	info, err := os.Stat(path)
+
+	if os.IsNotExist(err) {
+		return false
+	}
+
+	return info.IsDir()
+}
