@@ -15,4 +15,7 @@ limitations under the License.
 */
 package filesystem
 
-const FileModeExecutable = 0755
+const (
+	FileModeExecutable = 0755
+	EmptyString        = ""
+)

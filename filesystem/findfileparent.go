@@ -22,39 +22,28 @@ import (
 	"path/filepath"
 )
 
-func FindFile(filename string) (string, error) {
+func FindFileParent(filename string) (string, error) {
 	pwd, _ := os.Getwd()
 	absStart, err := filepath.Abs(pwd)
 	if err != nil {
 		return EmptyString, fmt.Errorf("failed to resolve current directory: %w", err)
 	}
 
-	if found, err := searchChildren(filename, absStart); err == nil {
-		return found, nil
-	}
+	current := filepath.Dir(absStart)
 
-	return EmptyString, fmt.Errorf("failed to find '%s'", filename)
-}
+	for {
+		candidate := filepath.Join(current, filename)
 
-func searchChildren(filename, dir string) (string, error) {
-	entries, err := os.ReadDir(dir)
-	if err != nil {
-		return "", fmt.Errorf("failed to read directory %s: %w", dir, err)
-	}
-
-	for _, entry := range entries {
-		fullPath := filepath.Join(dir, entry.Name())
-
-		if !entry.IsDir() {
-			if entry.Name() == filename {
-				return fullPath, nil
-			}
-		} else {
-			if found, err := searchChildren(filename, fullPath); err == nil {
-				return found, nil
-			}
+		if _, err := os.Stat(candidate); err == nil {
+			return candidate, nil
 		}
-	}
 
-	return EmptyString, errors.New("file not found in children")
+		parent := filepath.Dir(current)
+
+		if parent == current {
+			return EmptyString, errors.New("file not found: no more parent directories to search")
+		}
+
+		current = parent
+	}
 }
