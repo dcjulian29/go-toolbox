@@ -20,7 +20,8 @@ limitations under the License.
 */
 
 const (
-	// FileModeExecutable represents the standard octal file permission mode for executable files and directories (typically 0755).
+	// FileModeExecutable represents the standard octal file permission mode
+	// for executable files and directories (typically 0755).
 	FileModeExecutable = 0755
 	// EmptyString represents a constant value for an empty string.
 	EmptyString = ""

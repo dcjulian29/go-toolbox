@@ -1,4 +1,5 @@
-// Package color provides utility functions and constants for outputting ANSI color-coded text and formatting to the terminal.
+// Package color provides utility functions and constants for outputting
+// ANSI color-coded text and formatting to the terminal.
 package color
 
 /*
