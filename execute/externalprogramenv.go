@@ -1,3 +1,5 @@
+package execute
+
 /*
 Copyright © 2026 Julian Easterling
 
@@ -13,13 +15,14 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package execute
 
 import (
 	"os"
 	"os/exec"
 )
 
+// ExternalProgramEnv runs the specified external program with the given parameters and
+// additional environment variables, binding its streams directly to the host OS standard streams.
 func ExternalProgramEnv(program string, env []string, params ...string) error {
 	cmd := exec.Command(program, params...)
 	cmd.Stderr = os.Stderr

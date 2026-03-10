@@ -1,3 +1,5 @@
+package filesystem
+
 /*
 Copyright © 2026 Julian Easterling
 
@@ -13,13 +15,14 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package filesystem
 
 import (
 	"io/fs"
 	"path/filepath"
 )
 
+// FindFilesByExtension recursively searches a directory for all files matching
+// the given file extension.
 func FindFilesByExtension(path, extension string) ([]string, error) {
 	var files []string
 

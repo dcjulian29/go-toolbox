@@ -1,4 +1,6 @@
-package filesystem
+// Package execute provides helper functions to run external system commands,
+// capture standard output and error, and manage execution environments.
+package execute
 
 /*
 Copyright © 2026 Julian Easterling
@@ -15,18 +17,3 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-
-import (
-	"os"
-)
-
-// DirectoryExists checks if the given path exists and is a directory.
-func DirectoryExists(path string) bool {
-	info, err := os.Stat(path)
-
-	if os.IsNotExist(err) {
-		return false
-	}
-
-	return info.IsDir()
-}

@@ -1,3 +1,5 @@
+package network
+
 /*
 Copyright © 2026 Julian Easterling
 
@@ -13,7 +15,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package network
 
 import (
 	"net"
@@ -22,6 +23,8 @@ import (
 	"strings"
 )
 
+// Ping sends an ICMP echo request to the specified target host to verify
+// network connectivity, returning an error if the host is unreachable.
 func Ping(address string) bool {
 	addr, err := net.ResolveIPAddr("ip", address)
 	if err != nil {

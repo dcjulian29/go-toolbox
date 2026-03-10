@@ -1,3 +1,8 @@
+// Package filesystem contains robust utility functions for interacting with
+// the file system, such as checking file existence, copying files, computing
+// file hashes, and finding files.
+package filesystem
+
 /*
 Copyright © 2026 Julian Easterling
 
@@ -13,9 +18,10 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package filesystem
 
 const (
+	// FileModeExecutable represents the standard octal file permission mode for executable files and directories (typically 0755).
 	FileModeExecutable = 0755
-	EmptyString        = ""
+	// EmptyString represents a constant value for an empty string.
+	EmptyString = ""
 )

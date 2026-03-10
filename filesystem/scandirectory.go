@@ -1,3 +1,5 @@
+package filesystem
+
 /*
 Copyright © 2026 Julian Easterling
 
@@ -13,7 +15,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package filesystem
 
 import (
 	"os"
@@ -21,6 +22,8 @@ import (
 	"strings"
 )
 
+// ScanDirectory traverses the specified directory and performs an operation
+// or returns a list of its contents based on standard filtering criteria.
 func ScanDirectory(path string, ignore []string) ([]string, []string, error) {
 	folders := []string{}
 	files := []string{}

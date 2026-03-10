@@ -1,3 +1,5 @@
+package filesystem
+
 /*
 Copyright © 2026 Julian Easterling
 
@@ -13,7 +15,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package filesystem
 
 import (
 	"errors"
@@ -22,6 +23,8 @@ import (
 	"path/filepath"
 )
 
+// FindFileParent searches for files matching a pattern starting from a
+// specific directory and moving upwards through its parent directories.
 func FindFileParent(filename string) (string, error) {
 	pwd, _ := os.Getwd()
 	absStart, err := filepath.Abs(pwd)

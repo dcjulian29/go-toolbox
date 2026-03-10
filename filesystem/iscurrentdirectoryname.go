@@ -1,3 +1,5 @@
+package filesystem
+
 /*
 Copyright © 2026 Julian Easterling
 
@@ -13,13 +15,14 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package filesystem
 
 import (
 	"os"
 	"path/filepath"
 )
 
+// IsCurrentDirectoryName checks if the specified string matches the name
+// of the current working directory.
 func IsCurrentDirectoryName(name string) bool {
 	pwd, _ := os.Getwd()
 

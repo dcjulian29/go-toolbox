@@ -1,3 +1,5 @@
+package filesystem
+
 /*
 Copyright © 2026 Julian Easterling
 
@@ -13,12 +15,12 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package filesystem
 
 import (
 	"os"
 )
 
+// FileExists checks if a file exists at the given path and is not a directory.
 func FileExists(path string) bool {
 	info, err := os.Stat(path)
 

@@ -1,3 +1,5 @@
+package filesystem
+
 /*
 Copyright © 2026 Julian Easterling
 
@@ -13,7 +15,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package filesystem
 
 import (
 	"crypto/sha256"
@@ -22,6 +23,8 @@ import (
 	"os"
 )
 
+// FileHash computes and returns the cryptographic hash (e.g., SHA256) of
+// the specified file's contents.
 func FileHash(path string) (string, error) {
 	hash := sha256.New()
 

@@ -1,3 +1,5 @@
+package filesystem
+
 /*
 Copyright © 2026 Julian Easterling
 
@@ -13,10 +15,11 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package filesystem
 
 import "os"
 
+// EnsureFileExist creates a file at the specified path and writes the provided content to it.
+// If the file already exists, it is truncated and overwritten.
 func EnsureFileExist(path string, content []byte) error {
 	file, err := os.Create(path)
 	if err != nil {

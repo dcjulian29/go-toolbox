@@ -1,3 +1,5 @@
+package execute
+
 /*
 Copyright © 2026 Julian Easterling
 
@@ -13,13 +15,14 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package execute
 
 import (
 	"os"
 	"os/exec"
 )
 
+// ExternalProgramCapture runs the specified external program with the given parameters
+// and captures its combined standard output and standard error, returning the result as a string.
 func ExternalProgramCapture(program string, params ...string) (string, error) {
 	cmd := exec.Command(program, params...)
 	cmd.Stdin = os.Stdin

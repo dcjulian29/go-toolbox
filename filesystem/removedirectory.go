@@ -1,3 +1,5 @@
+package filesystem
+
 /*
 Copyright © 2026 Julian Easterling
 
@@ -13,13 +15,14 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package filesystem
 
 import (
 	"os"
 	"path/filepath"
 )
 
+// RemoveDirectory completely deletes the specified directory and all of
+// its contents from the file system.
 func RemoveDirectory(path string) error {
 	if DirectoryExists(path) {
 		files, err := filepath.Glob(filepath.Join(path, "*"))

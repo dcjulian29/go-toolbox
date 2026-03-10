@@ -1,3 +1,5 @@
+package filesystem
+
 /*
 Copyright © 2026 Julian Easterling
 
@@ -13,12 +15,13 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package filesystem
 
 import (
 	"os"
 )
 
+// EnsureDirectoryExist verifies that a directory exists at the given path,
+// creating it and any necessary parent directories if it does not exist.
 func EnsureDirectoryExist(path string) error {
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		if err := os.MkdirAll(path, FileModeExecutable); err != nil {
