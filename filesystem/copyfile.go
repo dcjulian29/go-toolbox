@@ -17,9 +17,11 @@ limitations under the License.
 */
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 )
 
 // CopyFile duplicates a file from the source path to the destination path,
@@ -27,6 +29,10 @@ import (
 func CopyFile(src, dst string) error {
 	if !FileExists(src) {
 		return fmt.Errorf("source file '%s' does not exists", src)
+	}
+
+	if !DirectoryExists(filepath.Dir(dst)) {
+		return errors.New("destination directory does not exist")
 	}
 
 	if FileExists(dst) {
@@ -40,19 +46,16 @@ func CopyFile(src, dst string) error {
 		return err
 	}
 
-	defer source.Close()
+	defer source.Close() //nolint
 
 	destination, err := os.Create(dst)
 	if err != nil {
 		return err
 	}
 
-	defer destination.Close()
+	defer destination.Close() //nolint
 
 	_, err = io.Copy(destination, source)
-	if err != nil {
-		return err
-	}
 
-	return nil
+	return err
 }
