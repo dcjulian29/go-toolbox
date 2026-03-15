@@ -25,6 +25,9 @@
     "nolint",
     "perfsprint",
     "runas",
-    "unconvert"
+    "Unattend",
+    "unconvert",
+    "VHDX",
+    "vmconnect"
   ]
 }
