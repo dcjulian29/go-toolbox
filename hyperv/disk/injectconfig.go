@@ -1,4 +1,4 @@
-package hyperv_disk
+package hvdisk
 
 /*
 Copyright © 2026 Julian Easterling

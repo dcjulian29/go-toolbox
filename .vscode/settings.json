@@ -19,6 +19,7 @@
     "gomod",
     "gosec",
     "govet",
+    "hyperv",
     "iface",
     "ncipollo",
     "nlreturn",

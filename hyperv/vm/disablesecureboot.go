@@ -1,6 +1,6 @@
 //go:build windows
 
-package hyperv_vm
+package hvvm
 
 /*
 Copyright © 2026 Julian Easterling
