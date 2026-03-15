@@ -23,6 +23,7 @@
     "nlreturn",
     "nolint",
     "perfsprint",
+    "runas",
     "unconvert"
   ]
 }
