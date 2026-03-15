@@ -1,6 +1,5 @@
 //go:build windows
 
-// Package elevation provides functions to check if elevated and restart in an elevated state
 package elevation
 
 /*
@@ -24,26 +23,7 @@ import (
 	"strings"
 	"syscall"
 	"unsafe"
-
-	"golang.org/x/sys/windows"
 )
-
-// IsElevated returns true when the current process holds administrator privileges.
-func IsElevated() bool {
-	var token windows.Token
-
-	if err := windows.OpenProcessToken(
-		windows.CurrentProcess(),
-		windows.TOKEN_QUERY,
-		&token,
-	); err != nil {
-		return false
-	}
-
-	defer token.Close() //nolint
-
-	return token.IsElevated()
-}
 
 // RelaunchElevated re-executes the current process with administrative privileges
 // which triggers the Windows UAC prompt.
