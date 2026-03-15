@@ -1,4 +1,4 @@
-// Package util provides various text formating functions.
+// Package textformat provides various text formating functions.
 package textformat
 
 /*
