@@ -1,5 +1,5 @@
-// Package disk provides functions to inject files to a mountable VHDX file
-package disk
+// Package hyperv_disk provides functions to inject files to a mountable VHDX file
+package hyperv_disk
 
 /*
 Copyright © 2026 Julian Easterling

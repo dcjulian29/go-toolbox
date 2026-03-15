@@ -1,5 +1,5 @@
-// Package vm provides functions to interact with Hyper-V Virtual Machines
-package vm
+// Package hyperv_vm provides functions to interact with Hyper-V Virtual Machines
+package hyperv_vm
 
 /*
 Copyright © 2026 Julian Easterling

@@ -1,5 +1,5 @@
-// Package host provides functions to interact with the Hyper-V host
-package host
+// Package hyperv_host provides functions to interact with the Hyper-V host
+package hyperv_host
 
 /*
 Copyright © 2026 Julian Easterling

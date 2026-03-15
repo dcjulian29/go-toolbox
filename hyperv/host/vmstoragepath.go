@@ -1,6 +1,6 @@
 //go:build windows
 
-package host
+package hyperv_host
 
 /*
 Copyright © 2026 Julian Easterling
