@@ -1,0 +1,39 @@
+//go:build windows
+
+package hypervmachine
+
+/*
+Copyright © 2026 Julian Easterling
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+	http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+import (
+	"fmt"
+	"strings"
+
+	"github.com/dcjulian29/go-toolbox/execute"
+	"github.com/dcjulian29/go-toolbox/textformat"
+)
+
+// Exists returns true when a VM with that name is registered in Hyper-V.
+func Exists(name string) bool {
+	script := fmt.Sprintf(
+		`(Get-VM -VMName '%s' -ErrorAction SilentlyContinue) -ne $null`,
+		textformat.EscapeForPowershell(name),
+	)
+
+	exist, err := execute.RunPowershellCapture(script)
+
+	return err == nil && strings.EqualFold(exist, "True")
+}

@@ -80,10 +80,6 @@ linters:
         - name: line-length-limit
           arguments:
             - 120
-        - name: package-directory-mismatch
-          arguments:
-            - ignore-directories:
-              - hyperv
         - name: var-naming
           arguments:
             - []
