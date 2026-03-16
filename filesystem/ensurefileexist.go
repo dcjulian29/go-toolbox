@@ -16,11 +16,18 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import "os"
+import (
+	"os"
+	"path/filepath"
+)
 
 // EnsureFileExist creates a file at the specified path and writes the provided content to it.
 // If the file already exists, it is truncated and overwritten.
 func EnsureFileExist(path string, content []byte) error {
+	if err := EnsureDirectoryExist(filepath.Dir(path)); err != nil {
+		return err
+	}
+
 	file, err := os.Create(path)
 	if err != nil {
 		return err
