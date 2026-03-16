@@ -43,5 +43,5 @@ func Mount(path string) (string, error) {
 		return "", fmt.Errorf("no drive letter assigned after mounting %s", filepath.Base(path)) //nolint
 	}
 
-	return letter + ":", nil
+	return letter + `:\`, nil
 }
