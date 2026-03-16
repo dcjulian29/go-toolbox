@@ -46,8 +46,6 @@ func InjectUnattendFile(cfg *InjectConfig) error {
 		if err := filesystem.EnsureFileExist(dest, []byte(content)); err != nil {
 			return fmt.Errorf("error writing unattend.xml: %w", err)
 		}
-
-		fmt.Println(textformat.Info("[inject] unattend.xml"))
 	}
 
 	return nil

@@ -25,7 +25,6 @@ import (
 	"strings"
 
 	"github.com/dcjulian29/go-toolbox/filesystem"
-	"github.com/dcjulian29/go-toolbox/textformat"
 )
 
 // InjectStartScript injects the startup script to the VHDX file
@@ -47,8 +46,6 @@ func InjectStartScript(cfg *InjectConfig) error {
 		if err := filesystem.EnsureFileExist(dest, []byte(content)); err != nil {
 			return fmt.Errorf("writing startup script: %w", err)
 		}
-
-		fmt.Println(textformat.Info("[inject] startup script"))
 	}
 
 	return nil

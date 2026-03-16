@@ -19,11 +19,9 @@ limitations under the License.
 */
 
 import (
-	"fmt"
 	"path/filepath"
 
 	"github.com/dcjulian29/go-toolbox/filesystem"
-	"github.com/dcjulian29/go-toolbox/textformat"
 )
 
 // InjectStartCommand injects the startup command executed just after the first login.
@@ -33,8 +31,6 @@ func InjectStartCommand(cfg *InjectConfig) error {
 	content := "%WINDIR%\\System32\\WindowsPowerShell\\v1.0\\powershell.exe "
 	content = content + "-NoProfile -NonInteractive -ExecutionPolicy Bypass -NoLogo -Command "
 	content = content + "%WINDIR%\\Setup\\Scripts\\" + filepath.Base(cfg.StartScript)
-
-	fmt.Println(textformat.Info("[inject] start command"))
 
 	return filesystem.EnsureFileExist(path, []byte(content))
 }
