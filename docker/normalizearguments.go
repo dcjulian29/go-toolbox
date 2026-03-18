@@ -24,7 +24,7 @@ limitations under the License.
 // NormalizeArguments normalizes arguments to replace Windows backslash
 // path separators with forward slashes for use inside the Linux container.
 func NormalizeArguments() []string {
-	args := os.Args[1:]
+	args := os.Args[1:] //nolint
 
 	for i, arg := range args {
 		args[i] = strings.ReplaceAll(strings.ReplaceAll(arg, "\\", "/"), ":", "")

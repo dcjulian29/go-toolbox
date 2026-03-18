@@ -30,10 +30,10 @@ func HostContainerVolume() (string, string) {
 	pwd, _ := os.Getwd()
 	pwd = strings.ReplaceAll(strings.ReplaceAll(pwd, "\\", "/"), ":", "")
 
-	host := fmt.Sprintf("%s:\\", string(pwd[0]))
-	container := fmt.Sprintf("/%s", string(pwd[0]))
+	host := fmt.Sprintf("%s:\\", string(pwd[0]))    //nolint
+	container := fmt.Sprintf("/%s", string(pwd[0])) //nolint
 
-	data := pwd[2:]
+	data := pwd[2:] //nolint
 
 	work := fmt.Sprintf("%s/%s", container, data)
 
