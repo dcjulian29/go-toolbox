@@ -23,8 +23,9 @@ import (
 	"strings"
 )
 
-// RunPowershellCapture executes a PowerShell command and returns the combined
-// stdout as a trimmed string.
+// RunPowershellCapture executes a PowerShell command and captures its combined
+// standard output returning the result as a string. If there is output to
+// standard error, return that as an error.
 func RunPowershellCapture(command string) (string, error) {
 	var out, errBuf bytes.Buffer
 

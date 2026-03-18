@@ -17,20 +17,24 @@ limitations under the License.
 */
 
 import (
-	"os"
+	"bytes"
+	"fmt"
 	"os/exec"
+	"strings"
 )
 
-// ExternalProgramCapture runs the specified external program with the given parameters
-// and captures its combined standard output and standard error, returning the result as a string.
+// ExternalProgramCapture runs the docker container with the given parameters
+// and captures its standard output returning the result as a string.
+// If there is output to standard error, return that as an error.
 func ExternalProgramCapture(program string, params ...string) (string, error) {
-	cmd := exec.Command(program, params...)
-	cmd.Stdin = os.Stdin
-	out, err := cmd.CombinedOutput()
+	var out, errBuf bytes.Buffer
 
-	if err != nil {
-		return "", err
+	cmd := exec.Command(program, params...)
+	cmd.Stdout = &out
+	cmd.Stderr = &errBuf
+	if err := cmd.Run(); err != nil {
+		return "", fmt.Errorf("%w\n%s", err, errBuf.String())
 	}
 
-	return string(out), nil
+	return strings.TrimSpace(out.String()), nil
 }
