@@ -2,6 +2,7 @@ package docker
 
 import (
 	"os"
+	"regexp"
 	"strings"
 )
 
@@ -21,18 +22,30 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+// driveRegex matches a word boundary (\b), a single letter, a colon,
+// and a slash or backslash. This ensures it matches " C:\" or "=D:/"
+// but ignores "http://" or "localhost:8080/"
+var driveRegex = regexp.MustCompile(`\b([a-zA-Z]):[\\/]`)
+
 // NormalizeArguments normalizes arguments to replace Windows backslash
 // path separators with forward slashes for use inside the Linux container.
 func NormalizeArguments() []string {
 	args := os.Args[1:] //nolint
 
 	for i, arg := range args {
-		if len(arg) >= 2 && arg[1] == ':' { //nolint:revive
-			// arg looks like a full path including drive letter (eg. c:\full\path)
-			arg = arg[:1] + arg[2:] //nolint:revive
+		if !driveRegex.MatchString(arg) {
+			continue
 		}
 
-		args[i] = strings.ReplaceAll(arg, "\\", "/")
+		arg = strings.ReplaceAll(arg, "\\", "/")
+
+		arg = driveRegex.ReplaceAllStringFunc(arg, func(match string) string {
+			driveLetter := match[0:1] //nolint:revive
+
+			return "/" + driveLetter + "/"
+		})
+
+		args[i] = arg
 	}
 
 	return args
