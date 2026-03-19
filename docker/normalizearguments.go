@@ -27,7 +27,12 @@ func NormalizeArguments() []string {
 	args := os.Args[1:] //nolint
 
 	for i, arg := range args {
-		args[i] = strings.ReplaceAll(strings.ReplaceAll(arg, "\\", "/"), ":", "")
+		if len(arg) >= 2 && arg[1] == ':' { //nolint:revive
+			// arg looks like a full path including drive letter (eg. c:\full\path)
+			arg = arg[:1] + arg[2:] //nolint:revive
+		}
+
+		args[i] = strings.ReplaceAll(arg, "\\", "/")
 	}
 
 	return args
