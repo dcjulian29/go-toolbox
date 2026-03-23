@@ -31,5 +31,6 @@ jobs:
           tag_name: ${{ steps.changelog.outputs.tag }}
           body: |
             ## Changelog (since ${{ steps.changelog.outputs.ref }})
-            Changes:\n${{ steps.changelog.outputs.changes }}
+            ${{ steps.changelog.outputs.changes }}
+            #### Previous Release: ${{ steps.changelog.outputs.ref }}
           make_latest: true
