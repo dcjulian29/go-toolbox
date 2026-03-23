@@ -1,11 +1,3 @@
-package docker
-
-import (
-	"fmt"
-
-	"github.com/dcjulian29/go-toolbox/execute"
-)
-
 /*
 Copyright © 2026 Julian Easterling
 
@@ -22,20 +14,30 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+package docker
+
+import (
+	"strings"
+
+	"github.com/dcjulian29/go-toolbox/filesystem"
+)
+
 // RunInteractive runs the docker container with the given parameters,
 // binding its standard input, output, and error streams directly to
 // the host OS standard streams.
+// Deprecated: Use github.com/dcjulian29/go-toolbox/docker
+// Run function and ContainerOptions instead.
 func RunInteractive(image, tag, envPrefix string) error {
-	args := []string{
-		"run",
-		"--rm",
-		"-it",
+	opts := ContainerOptions{
+		Keep:                 false,
+		EnvironmentVariables: EnvironmentVariablesWithPrefix(envPrefix),
+		AdditionalArgs:       strings.Join(HostAndWorkArguments(), " "),
+		Image:                image,
+		Tag:                  tag,
+		Command:              strings.Join(filesystem.EnsureUnixPathArguments(), " "),
 	}
 
-	args = append(args, EnvironmentVariables(envPrefix)...)
-	args = append(args, HostAndWorkArguments()...)
-	args = append(args, fmt.Sprintf("%s:%s", image, tag))
-	args = append(args, NormalizeArguments()...)
+	_, err := Run(opts)
 
-	return execute.ExternalProgram("docker", args...)
+	return err
 }

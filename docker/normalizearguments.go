@@ -1,11 +1,3 @@
-package docker
-
-import (
-	"os"
-	"regexp"
-	"strings"
-)
-
 /*
 Copyright © 2026 Julian Easterling
 
@@ -22,31 +14,16 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-// driveRegex matches a word boundary (\b), a single letter, a colon,
-// and a slash or backslash. This ensures it matches " C:\" or "=D:/"
-// but ignores "http://" or "localhost:8080/"
-var driveRegex = regexp.MustCompile(`\b([a-zA-Z]):[\\/]`)
+package docker
+
+import (
+	"github.com/dcjulian29/go-toolbox/filesystem"
+)
 
 // NormalizeArguments normalizes arguments to replace Windows backslash
 // path separators with forward slashes for use inside the Linux container.
+// Deprecated: Use github.com/dcjulian29/go-toolbox/filesystem
+// EnsureUnixPathArguments function instead.
 func NormalizeArguments() []string {
-	args := os.Args[1:] //nolint
-
-	for i, arg := range args {
-		if !driveRegex.MatchString(arg) {
-			continue
-		}
-
-		arg = strings.ReplaceAll(arg, "\\", "/")
-
-		arg = driveRegex.ReplaceAllStringFunc(arg, func(match string) string {
-			driveLetter := match[0:1] //nolint:revive
-
-			return "/" + driveLetter + "/"
-		})
-
-		args[i] = arg
-	}
-
-	return args
+	return filesystem.EnsureUnixPathArguments()
 }

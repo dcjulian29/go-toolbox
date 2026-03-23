@@ -1,11 +1,3 @@
-package docker
-
-import (
-	"fmt"
-	"os"
-	"strings"
-)
-
 /*
 Copyright © 2026 Julian Easterling
 
@@ -21,6 +13,14 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+
+package docker
+
+import (
+	"fmt"
+	"os"
+	"strings"
+)
 
 // HostContainerVolume normalizes the working directory path by replacing Windows
 // backslash path separators with forward slashes for use inside the Linux container

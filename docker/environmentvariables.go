@@ -1,10 +1,3 @@
-package docker
-
-import (
-	"os"
-	"strings"
-)
-
 /*
 Copyright © 2026 Julian Easterling
 
@@ -21,8 +14,17 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+package docker
+
+import (
+	"os"
+	"strings"
+)
+
 // EnvironmentVariables scans the host environment variables to find
 // variables prefixed with the provided string to pass into the container.
+// Deprecated: Use github.com/dcjulian29/go-toolbox/docker
+// EnvironmentVariablesWithPrefix function and ContainerOptions instead.
 func EnvironmentVariables(prefix string) []string {
 	env := []string{}
 

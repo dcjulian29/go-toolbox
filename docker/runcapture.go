@@ -1,11 +1,3 @@
-package docker
-
-import (
-	"fmt"
-
-	"github.com/dcjulian29/go-toolbox/execute"
-)
-
 /*
 Copyright © 2026 Julian Easterling
 
@@ -22,19 +14,29 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+package docker
+
+import (
+	"strings"
+
+	"github.com/dcjulian29/go-toolbox/filesystem"
+)
+
 // RunCapture runs the docker container with the given parameters
 // and captures its standard output returning the result as a string.
 // If there is output to standard error, return that as an error.
+// Deprecated: Use github.com/dcjulian29/go-toolbox/docker
+// Run function and ContainerOptions instead.
 func RunCapture(image, tag, envPrefix string) (string, error) {
-	args := []string{
-		"run",
-		"--rm",
+	opts := ContainerOptions{
+		Keep:                 false,
+		EnvironmentVariables: EnvironmentVariablesWithPrefix(envPrefix),
+		AdditionalArgs:       strings.Join(HostAndWorkArguments(), " "),
+		Image:                image,
+		Tag:                  tag,
+		Command:              strings.Join(filesystem.EnsureUnixPathArguments(), " "),
+		Capture:              true,
 	}
 
-	args = append(args, EnvironmentVariables(envPrefix)...)
-	args = append(args, HostAndWorkArguments()...)
-	args = append(args, fmt.Sprintf("%s:%s", image, tag))
-	args = append(args, NormalizeArguments()...)
-
-	return execute.ExternalProgramCapture("docker", args...)
+	return Run(opts)
 }
