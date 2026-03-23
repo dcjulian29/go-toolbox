@@ -27,5 +27,5 @@ jobs:
           tag_name: ${{ steps.changes.outputs.tag }}
           body: |
             ## Changelog (since ${{ steps.changes.outputs.ref }})
-            ${{ steps.changes.outputs.log }}
+            ${{ steps.changes.outputs.changes }}
           make_latest: true
