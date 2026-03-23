@@ -18,14 +18,18 @@ jobs:
           fetch-depth: 0
 
       - uses: simbo/changes-between-tags-action@v1
-        id: changes
+        id: changelog
         with:
           line-prefix: '* '
 
+      - run: |
+          echo "tag: ${{ steps.changelog.outputs.tag }}"
+          echo "changes: ${{ steps.changlog.outputs.changes }}"
+
       - uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ steps.changes.outputs.tag }}
+          tag_name: ${{ steps.changelog.outputs.tag }}
           body: |
-            ## Changelog (since ${{ steps.changes.outputs.ref }})
-            ${{ steps.changes.outputs.changes }}
+            ## Changelog (since ${{ steps.changelog.outputs.ref }})
+            ${{ steps.changelog.outputs.changes }}
           make_latest: true
