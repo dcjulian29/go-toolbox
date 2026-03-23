@@ -22,10 +22,6 @@ jobs:
         with:
           line-prefix: '* '
 
-      - run: |
-          echo "tag: ${{ steps.changelog.outputs.tag }}"
-          echo "changes: ${{ steps.changelog.outputs.changes }}"
-
       - uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.changelog.outputs.tag }}
