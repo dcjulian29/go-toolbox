@@ -21,25 +21,40 @@ import (
 	"strings"
 )
 
-// driveRegex matches a word boundary (\b), a single letter, a colon,
-// and a slash or backslash. This ensures it matches " C:\" or "=D:/"
-// but ignores "http://" or "localhost:8080/"
-var driveRegex = regexp.MustCompile(`\b([a-zA-Z]):[\\/]`)
+var (
+	// Absolute path: single letter followed by :\ or :/
+	// It matches a word boundary (\b), a single letter, a colon,
+	// and a slash or backslash. This ensures it matches " C:\" or "=D:/"
+	// but ignores "http://" or "localhost:8080/"
+	driveRegex = regexp.MustCompile(`\b([a-zA-Z]):[\\/]`)
+
+	// Relative path: a non-whitespace token containing at least one backslash
+	// between path-like segments. Handles:
+	//   .\path\to\file
+	//   ..\path\to\file
+	//   folder\subfolder\file.txt
+	//
+	// The negative lookbehind-style anchor (?:^|\s|=) prevents matching
+	// backslash escape sequences embedded in other contexts.
+	relativeRegex = regexp.MustCompile(`((?:^|[\s="']))(\.{0,2}\\[^\s]+|[^\s\\:=]+(?:\\[^\s\\]+)+)`)
+)
 
 // EnsurePathIsUnix normalizes the provided path to replace Windows backslash
 // path separators with forward slashes for use inside the Linux container.
 func EnsurePathIsUnix(path string) string {
-	if !driveRegex.MatchString(path) {
-		return path
+	if driveRegex.MatchString(path) {
+		path = strings.ReplaceAll(path, "\\", "/")
+
+		path = driveRegex.ReplaceAllStringFunc(path, func(match string) string {
+			driveLetter := match[0:1] //nolint:revive
+
+			return "/" + driveLetter + "/"
+		})
 	}
 
-	path = strings.ReplaceAll(path, "\\", "/")
-
-	path = driveRegex.ReplaceAllStringFunc(path, func(match string) string {
-		driveLetter := match[0:1] //nolint:revive
-
-		return "/" + driveLetter + "/"
-	})
+	if relativeRegex.MatchString(path) {
+		path = strings.ReplaceAll(path, "\\", "/")
+	}
 
 	return path
 }
