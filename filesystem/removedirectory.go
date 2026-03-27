@@ -24,7 +24,7 @@ import (
 // RemoveDirectory completely deletes the specified directory and all of
 // its contents from the file system.
 func RemoveDirectory(path string) error {
-	if DirectoryExists(path) {
+	if DirectoryExist(path) {
 		files, err := filepath.Glob(filepath.Join(path, "*"))
 		if err != nil {
 			return err

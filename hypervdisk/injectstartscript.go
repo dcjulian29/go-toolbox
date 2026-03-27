@@ -29,7 +29,7 @@ import (
 
 // InjectStartScript injects the startup script to the VHDX file
 func InjectStartScript(cfg *InjectConfig) error {
-	if cfg.StartScript != "" && filesystem.FileExists(cfg.StartScript) {
+	if cfg.StartScript != "" && filesystem.FileExist(cfg.StartScript) {
 		raw, err := os.ReadFile(cfg.StartScript)
 		if err != nil {
 			return fmt.Errorf("error reading start script: %w", err)

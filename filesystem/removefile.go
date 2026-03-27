@@ -22,7 +22,7 @@ import (
 
 // RemoveFile deletes the specified file from the file system.
 func RemoveFile(path string) error {
-	if FileExists(path) {
+	if FileExist(path) {
 		return os.Remove(path)
 	}
 

@@ -27,15 +27,15 @@ import (
 // CopyFile duplicates a file from the source path to the destination path,
 // preserving the original file permissions and contents.
 func CopyFile(src, dst string) error {
-	if !FileExists(src) {
+	if !FileExist(src) {
 		return fmt.Errorf("source file '%s' does not exists", src)
 	}
 
-	if !DirectoryExists(filepath.Dir(dst)) {
+	if !DirectoryExist(filepath.Dir(dst)) {
 		return errors.New("destination directory does not exist")
 	}
 
-	if FileExists(dst) {
+	if FileExist(dst) {
 		if err := os.Remove(dst); err != nil {
 			return err
 		}

@@ -26,6 +26,7 @@
     "iface",
     "ncipollo",
     "nlreturn",
+    "noaccess",
     "nolint",
     "perfsprint",
     "runas",

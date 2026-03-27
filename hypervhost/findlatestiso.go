@@ -46,7 +46,7 @@ func FindLatestISO(directoryPath, pattern string) (string, error) {
 		}
 	}
 
-	if !filesystem.FileExists(latest) {
+	if !filesystem.FileExist(latest) {
 		return "", fmt.Errorf("ISO %q not found", latest) //nolint
 	}
 

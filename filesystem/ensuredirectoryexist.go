@@ -17,17 +17,26 @@ limitations under the License.
 */
 
 import (
+	"fmt"
 	"os"
 )
 
 // EnsureDirectoryExist verifies that a directory exists at the given path,
 // creating it and any necessary parent directories if it does not exist.
 func EnsureDirectoryExist(path string) error {
-	if _, err := os.Stat(path); os.IsNotExist(err) {
-		if err := os.MkdirAll(path, FileModeExecutable); err != nil {
-			return err
+	info, err := os.Stat(path)
+
+	if err == nil {
+		if !info.IsDir() {
+			return fmt.Errorf("'%s' exists but is not a directory", path)
 		}
+
+		return nil
 	}
 
-	return nil
+	if !os.IsNotExist(err) {
+		return err
+	}
+
+	return os.MkdirAll(path, FileModeExecutable)
 }

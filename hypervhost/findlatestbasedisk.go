@@ -46,7 +46,7 @@ func FindLatestBaseDisk(directoryPath, pattern string) (string, error) {
 		}
 	}
 
-	if !filesystem.FileExists(latest) {
+	if !filesystem.FileExist(latest) {
 		return "", fmt.Errorf("base disk %q not found", latest) //nolint
 	}
 

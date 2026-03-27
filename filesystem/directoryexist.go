@@ -20,11 +20,11 @@ import (
 	"os"
 )
 
-// DirectoryExists checks if the given path exists and is a directory.
-func DirectoryExists(path string) bool {
+// DirectoryExist checks if the given path exists and is a directory.
+func DirectoryExist(path string) bool {
 	info, err := os.Stat(path)
 
-	if os.IsNotExist(err) {
+	if err != nil {
 		return false
 	}
 

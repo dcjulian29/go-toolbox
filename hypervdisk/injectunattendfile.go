@@ -30,7 +30,7 @@ import (
 
 // InjectUnattendFile injects the unattend XML to the VHDX file.
 func InjectUnattendFile(cfg *InjectConfig) error {
-	if cfg.UnattendTemplate != "" && filesystem.FileExists(cfg.UnattendTemplate) {
+	if cfg.UnattendTemplate != "" && filesystem.FileExist(cfg.UnattendTemplate) {
 		raw, err := os.ReadFile(cfg.UnattendTemplate)
 		if err != nil {
 			return fmt.Errorf("error reading unattend template: %w", err)

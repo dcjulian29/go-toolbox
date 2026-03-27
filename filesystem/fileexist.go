@@ -20,8 +20,8 @@ import (
 	"os"
 )
 
-// FileExists checks if a file exists at the given path and is not a directory.
-func FileExists(path string) bool {
+// FileExist checks if a file exists at the given path and is not a directory.
+func FileExist(path string) bool {
 	info, err := os.Stat(path)
 
 	return err == nil && !info.IsDir()
