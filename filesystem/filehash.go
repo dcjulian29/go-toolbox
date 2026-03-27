@@ -21,6 +21,8 @@ import (
 	"encoding/hex"
 	"io"
 	"os"
+
+	"github.com/dcjulian29/go-toolbox/textformat"
 )
 
 // FileHash computes and returns the cryptographic hash (e.g., SHA256) of
@@ -30,7 +32,7 @@ func FileHash(path string) (string, error) {
 
 	sourceFile, err := os.Open(path)
 	if err != nil {
-		return "", err
+		return textformat.EmptyString, err
 	}
 
 	defer sourceFile.Close() //nolint:errcheck
@@ -38,7 +40,7 @@ func FileHash(path string) (string, error) {
 	_, err = io.Copy(hash, sourceFile)
 
 	if err != nil {
-		return "", err
+		return textformat.EmptyString, err
 	}
 
 	return hex.EncodeToString(hash.Sum(nil)), nil

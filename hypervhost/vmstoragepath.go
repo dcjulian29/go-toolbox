@@ -22,6 +22,7 @@ import (
 	"fmt"
 
 	"github.com/dcjulian29/go-toolbox/execute"
+	"github.com/dcjulian29/go-toolbox/textformat"
 )
 
 // VMStoragePath returns the configured VM storage path from the Hyper-V host.
@@ -29,7 +30,7 @@ func VMStoragePath() (string, error) {
 	script := `(Get-VMHost).VirtualHardDiskPath`
 	path, err := execute.RunPowershellCapture(script)
 	if err != nil {
-		return "", fmt.Errorf("retrieving default hard disk path: %w", err)
+		return textformat.EmptyString, fmt.Errorf("retrieving default hard disk path: %w", err)
 	}
 
 	return path, nil

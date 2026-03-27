@@ -21,6 +21,8 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+
+	"github.com/dcjulian29/go-toolbox/textformat"
 )
 
 // FindFileParent searches for files matching a pattern starting from a
@@ -29,7 +31,7 @@ func FindFileParent(filename string) (string, error) {
 	pwd, _ := os.Getwd()
 	absStart, err := filepath.Abs(pwd)
 	if err != nil {
-		return EmptyString, fmt.Errorf("failed to resolve current directory: %w", err)
+		return textformat.EmptyString, fmt.Errorf("failed to resolve current directory: %w", err)
 	}
 
 	current := filepath.Dir(absStart)
@@ -44,7 +46,7 @@ func FindFileParent(filename string) (string, error) {
 		parent := filepath.Dir(current)
 
 		if parent == current {
-			return EmptyString, errors.New("file not found: no more parent directories to search")
+			return textformat.EmptyString, errors.New("file not found: no more parent directories to search")
 		}
 
 		current = parent

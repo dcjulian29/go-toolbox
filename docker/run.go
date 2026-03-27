@@ -7,6 +7,7 @@ import (
 
 	"github.com/dcjulian29/go-toolbox/execute"
 	"github.com/dcjulian29/go-toolbox/filesystem"
+	"github.com/dcjulian29/go-toolbox/textformat"
 )
 
 // Run builds and executes a `docker run` command based on the
@@ -18,7 +19,7 @@ func Run(opts ContainerOptions) (string, error) {
 
 	entryArgs, entryVol, err := entryArguments(opts)
 	if err != nil {
-		return "", err
+		return textformat.EmptyString, err
 	}
 
 	opts.Volumes = append(opts.Volumes, entryVol...)
@@ -37,7 +38,7 @@ func Run(opts ContainerOptions) (string, error) {
 		return execute.ExternalProgramCapture("docker", args...)
 	}
 
-	return "", execute.ExternalProgram("docker", args...) //nolint
+	return textformat.EmptyString, execute.ExternalProgram("docker", args...) //nolint
 }
 
 func commandArguments(opts ContainerOptions) []string {

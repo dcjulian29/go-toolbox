@@ -1,8 +1,3 @@
-// Package filesystem contains robust utility functions for interacting with
-// the file system, such as checking file existence, copying files, computing
-// file hashes, and finding files.
-package filesystem
-
 /*
 Copyright © 2026 Julian Easterling
 
@@ -19,10 +14,19 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+// Package filesystem contains robust utility functions for interacting with
+// the file system, such as checking file existence, copying files, computing
+// file hashes, and finding files.
+package filesystem
+
+import "os"
+
 const (
 	// FileModeExecutable represents the standard octal file permission mode
 	// for executable files and directories (typically 0755).
-	FileModeExecutable = 0755
-	// EmptyString represents a constant value for an empty string.
-	EmptyString = ""
+	FileModeExecutable os.FileMode = 0o755 // rwxr-xr-x — directories, scripts
+
+	// FileModeReadable represents the standard octal file permission mode
+	// for readable files (typically 0644).
+	FileModeReadable os.FileMode = 0o644 // rw-r--r-- — regular files
 )

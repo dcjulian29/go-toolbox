@@ -19,6 +19,8 @@ limitations under the License.
 import (
 	"os"
 	"os/exec"
+
+	"github.com/dcjulian29/go-toolbox/textformat"
 )
 
 // ExternalProgramEnvCapture runs the specified external program with the given parameters
@@ -30,7 +32,7 @@ func ExternalProgramEnvCapture(program string, env []string, params ...string) (
 
 	output, err := cmd.CombinedOutput()
 	if err != nil {
-		return "", err
+		return textformat.EmptyString, err
 	}
 
 	return string(output[:]), nil

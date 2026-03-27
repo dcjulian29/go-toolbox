@@ -23,6 +23,7 @@ import (
 	"path/filepath"
 
 	"github.com/dcjulian29/go-toolbox/filesystem"
+	"github.com/dcjulian29/go-toolbox/textformat"
 )
 
 // FindLatestISO searches directoryPath for an ISO whose name matches
@@ -31,11 +32,11 @@ import (
 func FindLatestISO(directoryPath, pattern string) (string, error) {
 	matches, err := filepath.Glob(filepath.Join(directoryPath, pattern))
 	if err != nil {
-		return "", err
+		return textformat.EmptyString, err
 	}
 
 	if len(matches) == 0 { //nolint
-		return "", fmt.Errorf("no ISO matching '%q' found in '%s'", pattern, directoryPath)
+		return textformat.EmptyString, fmt.Errorf("no ISO matching '%q' found in '%s'", pattern, directoryPath)
 	}
 
 	latest := matches[0] //nolint
@@ -47,7 +48,7 @@ func FindLatestISO(directoryPath, pattern string) (string, error) {
 	}
 
 	if !filesystem.FileExist(latest) {
-		return "", fmt.Errorf("ISO %q not found", latest) //nolint
+		return textformat.EmptyString, fmt.Errorf("ISO %q not found", latest) //nolint
 	}
 
 	return latest, nil

@@ -21,6 +21,8 @@ import (
 	"fmt"
 	"os/exec"
 	"strings"
+
+	"github.com/dcjulian29/go-toolbox/textformat"
 )
 
 // ExternalProgramCapture runs the docker container with the given parameters
@@ -33,7 +35,7 @@ func ExternalProgramCapture(program string, params ...string) (string, error) {
 	cmd.Stdout = &out
 	cmd.Stderr = &errBuf
 	if err := cmd.Run(); err != nil {
-		return "", fmt.Errorf("%w\n%s", err, errBuf.String())
+		return textformat.EmptyString, fmt.Errorf("%w\n%s", err, errBuf.String())
 	}
 
 	return strings.TrimSpace(out.String()), nil

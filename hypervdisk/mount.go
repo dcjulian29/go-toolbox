@@ -36,11 +36,11 @@ func Mount(path string) (string, error) {
 
 	letter, err := execute.RunPowershellCapture(script)
 	if err != nil {
-		return "", fmt.Errorf("an error occurred when mounting VHDX %s: %w", filepath.Base(path), err) //nolint
+		return textformat.EmptyString, fmt.Errorf("an error occurred when mounting VHDX %s: %w", filepath.Base(path), err) //nolint
 	}
 
 	if letter == "" {
-		return "", fmt.Errorf("no drive letter assigned after mounting %s", filepath.Base(path)) //nolint
+		return textformat.EmptyString, fmt.Errorf("no drive letter assigned after mounting %s", filepath.Base(path)) //nolint
 	}
 
 	return letter + `:\`, nil

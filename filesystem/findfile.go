@@ -21,6 +21,8 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+
+	"github.com/dcjulian29/go-toolbox/textformat"
 )
 
 // FindFile searches the specified directory and its children for files that
@@ -29,20 +31,20 @@ func FindFile(filename string) (string, error) {
 	pwd, _ := os.Getwd()
 	absStart, err := filepath.Abs(pwd)
 	if err != nil {
-		return EmptyString, fmt.Errorf("failed to resolve current directory: %w", err)
+		return textformat.EmptyString, fmt.Errorf("failed to resolve current directory: %w", err)
 	}
 
 	if found, err := searchChildren(filename, absStart); err == nil {
 		return found, nil
 	}
 
-	return EmptyString, fmt.Errorf("failed to find '%s'", filename)
+	return textformat.EmptyString, fmt.Errorf("failed to find '%s'", filename)
 }
 
 func searchChildren(filename, dir string) (string, error) {
 	entries, err := os.ReadDir(dir)
 	if err != nil {
-		return "", fmt.Errorf("failed to read directory %s: %w", dir, err)
+		return textformat.EmptyString, fmt.Errorf("failed to read directory %s: %w", dir, err)
 	}
 
 	for _, entry := range entries {
@@ -59,5 +61,5 @@ func searchChildren(filename, dir string) (string, error) {
 		}
 	}
 
-	return EmptyString, errors.New("file not found in children")
+	return textformat.EmptyString, errors.New("file not found in children")
 }

@@ -21,6 +21,8 @@ import (
 	"fmt"
 	"os/exec"
 	"strings"
+
+	"github.com/dcjulian29/go-toolbox/textformat"
 )
 
 // RunPowershellCapture executes a PowerShell command and captures its combined
@@ -34,7 +36,7 @@ func RunPowershellCapture(command string) (string, error) {
 	cmd.Stdout = &out
 	cmd.Stderr = &errBuf
 	if err := cmd.Run(); err != nil {
-		return "", fmt.Errorf("%w\n%s", err, errBuf.String())
+		return textformat.EmptyString, fmt.Errorf("%w\n%s", err, errBuf.String())
 	}
 
 	return strings.TrimSpace(out.String()), nil

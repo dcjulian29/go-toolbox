@@ -23,6 +23,7 @@ import (
 	"path/filepath"
 
 	"github.com/dcjulian29/go-toolbox/filesystem"
+	"github.com/dcjulian29/go-toolbox/textformat"
 )
 
 // FindLatestBaseDisk searches directoryPath for a VHDX whose name matches
@@ -31,11 +32,11 @@ import (
 func FindLatestBaseDisk(directoryPath, pattern string) (string, error) {
 	matches, err := filepath.Glob(filepath.Join(directoryPath, pattern))
 	if err != nil {
-		return "", err //nolint
+		return textformat.EmptyString, err //nolint
 	}
 
 	if len(matches) == 0 { //nolint
-		return "", fmt.Errorf("no base disk matching '%q' found in '%s'", pattern, directoryPath) //nolint
+		return textformat.EmptyString, fmt.Errorf("no base disk matching '%q' found in '%s'", pattern, directoryPath) //nolint
 	}
 
 	latest := matches[0] //nolint
@@ -47,7 +48,7 @@ func FindLatestBaseDisk(directoryPath, pattern string) (string, error) {
 	}
 
 	if !filesystem.FileExist(latest) {
-		return "", fmt.Errorf("base disk %q not found", latest) //nolint
+		return textformat.EmptyString, fmt.Errorf("base disk %q not found", latest) //nolint
 	}
 
 	return latest, nil

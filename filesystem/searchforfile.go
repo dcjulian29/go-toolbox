@@ -19,6 +19,8 @@ limitations under the License.
 import (
 	"fmt"
 	"path/filepath"
+
+	"github.com/dcjulian29/go-toolbox/textformat"
 )
 
 // SearchForFile searches 'path' for the last file whose name matches the given
@@ -26,11 +28,11 @@ import (
 func SearchForFile(path, pattern string) (string, error) {
 	matches, err := filepath.Glob(filepath.Join(path, pattern))
 	if err != nil {
-		return "", err
+		return textformat.EmptyString, err
 	}
 
 	if len(matches) == 0 { //nolint:revive
-		return "", fmt.Errorf("no file matching '%q' found in '%s'", pattern, path)
+		return textformat.EmptyString, fmt.Errorf("no file matching '%q' found in '%s'", pattern, path)
 	}
 
 	return matches[len(matches)-1], nil //nolint:revive
