@@ -44,12 +44,24 @@ linters:
       - legacy
       - std-error-handling
     rules:
-      - linters:
-          - errcheck
+      - path: _test\.go
+        linters:
+          - funlen
+          - cyclop
           - dupl
+          - maintidx
           - gocyclo
-          - gosec
-        path: _test.go
+          - goerr113
+          - intrange
+          - wrapcheck
+          - varnamelen
+          - lll
+
+      # revive-specific rules for test files
+      - path: _test\.go
+        linter: revive
+        text: "add-constant|cyclomatic|function-length|cognitive-complexity|line-length-limit"
+
   settings:
     decorder:
       dec-order:
