@@ -13,7 +13,7 @@ import (
 // Run builds and executes a `docker run` command based on the
 // provided options. It returns the combined output and any error encountered.
 func Run(opts ContainerOptions) (string, error) {
-	if opts.Tag == "" {
+	if opts.Tag == textformat.EmptyString {
 		opts.Tag = "latest"
 	}
 
@@ -44,11 +44,11 @@ func Run(opts ContainerOptions) (string, error) {
 func commandArguments(opts ContainerOptions) []string {
 	var args []string
 
-	if opts.Command != "" {
+	if opts.Command != textformat.EmptyString {
 		args = append(args, opts.Command)
 	}
 
-	if opts.AdditionalArgs != "" {
+	if opts.AdditionalArgs != textformat.EmptyString {
 		args = append(args, strings.Fields(opts.AdditionalArgs)...)
 	}
 
@@ -62,11 +62,11 @@ func containerArguments(opts ContainerOptions) []string {
 		args = append(args, "--rm")
 	}
 
-	if opts.HostName != "" {
+	if opts.HostName != textformat.EmptyString {
 		args = append(args, "--hostname", opts.HostName)
 	}
 
-	if opts.Name != "" {
+	if opts.Name != textformat.EmptyString {
 		args = append(args, "--name", opts.Name)
 	}
 
@@ -74,11 +74,11 @@ func containerArguments(opts ContainerOptions) []string {
 		args = append(args, "--read-only")
 	}
 
-	if opts.User != "" {
+	if opts.User != textformat.EmptyString {
 		args = append(args, "--user="+opts.User)
 	}
 
-	if opts.WorkingDirectory != "" {
+	if opts.WorkingDirectory != textformat.EmptyString {
 		args = append(args, "--workdir", opts.WorkingDirectory)
 	}
 
@@ -86,11 +86,11 @@ func containerArguments(opts ContainerOptions) []string {
 }
 
 func entryArguments(opts ContainerOptions) (args []string, entryVolume []string, err error) {
-	if opts.EntryPoint != "" {
+	if opts.EntryPoint != textformat.EmptyString {
 		return []string{"--entrypoint", opts.EntryPoint}, nil, nil
 	}
 
-	if opts.EntryScript == "" {
+	if opts.EntryScript == textformat.EmptyString {
 		return nil, nil, nil
 	}
 
