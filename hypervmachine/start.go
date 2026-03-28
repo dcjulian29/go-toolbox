@@ -27,7 +27,7 @@ import (
 
 // Start starts the named virtual machine.
 func Start(name string) error {
-	script := fmt.Sprintf(`Start-VM -Name "%s" -ErrorAction Stop`, textformat.EscapeForPowershell(name))
+	script := fmt.Sprintf(`Start-VM -Name "%s" -ErrorAction Stop`, textformat.EscapeForPowerShell(name))
 
 	if err := execute.RunPowershell(script); err != nil {
 		return fmt.Errorf("starting VM %q: %w", name, err)

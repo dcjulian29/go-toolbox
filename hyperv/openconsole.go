@@ -27,7 +27,7 @@ import (
 
 // OpenConsole opens the Hyper-V Virtual Machine Connection console.
 func OpenConsole(name string) error {
-	script := fmt.Sprintf(`vmconnect.exe localhost "%s"`, textformat.EscapeForPowershell(name))
+	script := fmt.Sprintf(`vmconnect.exe localhost "%s"`, textformat.EscapeForPowerShell(name))
 
 	return execute.RunPowershell(script)
 }

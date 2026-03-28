@@ -30,8 +30,8 @@ func Remove(name string) error {
 	script := fmt.Sprintf(
 		`Stop-VM -Name "%s" -Force -TurnOff -ErrorAction SilentlyContinue; `+
 			`Remove-VM -Name "%s" -Force -ErrorAction Stop`,
-		textformat.EscapeForPowershell(name),
-		textformat.EscapeForPowershell(name),
+		textformat.EscapeForPowerShell(name),
+		textformat.EscapeForPowerShell(name),
 	)
 
 	return execute.RunPowershell(script)

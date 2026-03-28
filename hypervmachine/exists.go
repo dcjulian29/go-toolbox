@@ -30,7 +30,7 @@ import (
 func Exists(name string) bool {
 	script := fmt.Sprintf(
 		`(Get-VM -VMName '%s' -ErrorAction SilentlyContinue) -ne $null`,
-		textformat.EscapeForPowershell(name),
+		textformat.EscapeForPowerShell(name),
 	)
 
 	exist, err := execute.RunPowershellCapture(script)

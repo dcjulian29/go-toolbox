@@ -30,8 +30,8 @@ import (
 func SetSecureBootTemplate(name, template string) error {
 	script := fmt.Sprintf(
 		`Set-VMFirmware -VMName "%s" -SecureBootTemplate "%s" -ErrorAction Stop`,
-		textformat.EscapeForPowershell(name),
-		textformat.EscapeForPowershell(template),
+		textformat.EscapeForPowerShell(name),
+		textformat.EscapeForPowerShell(template),
 	)
 
 	return execute.RunPowershell(script)

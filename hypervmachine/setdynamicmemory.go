@@ -30,7 +30,7 @@ func SetDynamicMemory(name string, startBytes, minBytes, maxBytes int64) error {
 	script := fmt.Sprintf(
 		`Set-VMMemory -VMName "%s" -DynamicMemoryEnabled $true `+
 			`-StartupBytes %d -MinimumBytes %d -MaximumBytes %d -ErrorAction Stop`,
-		textformat.EscapeForPowershell(name), startBytes, minBytes, maxBytes,
+		textformat.EscapeForPowerShell(name), startBytes, minBytes, maxBytes,
 	)
 
 	return execute.RunPowershell(script)

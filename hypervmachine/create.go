@@ -35,10 +35,10 @@ func Create(cfg Config) error {
 		`New-VM -Generation %d -Name "%s" -MemoryStartupBytes %d `+
 			`-SwitchName "%s"-VHDPath "%s" -ErrorAction Stop`,
 		cfg.Generation,
-		textformat.EscapeForPowershell(cfg.Name),
+		textformat.EscapeForPowerShell(cfg.Name),
 		cfg.MemoryBytes,
-		textformat.EscapeForPowershell(cfg.VirtualSwitch),
-		textformat.EscapeForPowershell(cfg.VHDXPath),
+		textformat.EscapeForPowerShell(cfg.VirtualSwitch),
+		textformat.EscapeForPowerShell(cfg.VHDXPath),
 	)
 
 	if err := execute.RunPowershell(script); err != nil {

@@ -29,8 +29,8 @@ import (
 func AttachDVD(name, isoPath string) error {
 	script := fmt.Sprintf(
 		`Add-VMDvdDrive -VMName "%s" -Path "%s" -ErrorAction Stop`,
-		textformat.EscapeForPowershell(name),
-		textformat.EscapeForPowershell(isoPath),
+		textformat.EscapeForPowerShell(name),
+		textformat.EscapeForPowerShell(isoPath),
 	)
 
 	return execute.RunPowershell(script)

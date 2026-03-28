@@ -31,7 +31,7 @@ func Mount(path string) (string, error) {
 	script := fmt.Sprintf(
 		`$v = Mount-VHD -Path "%s" -PassThru -ErrorAction Stop; `+
 			`($v | Get-Disk | Get-Partition | Get-Volume).DriveLetter`,
-		textformat.EscapeForPowershell(path),
+		textformat.EscapeForPowerShell(path),
 	)
 
 	letter, err := execute.RunPowershellCapture(script)

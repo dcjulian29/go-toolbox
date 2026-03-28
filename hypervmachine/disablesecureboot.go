@@ -29,7 +29,7 @@ import (
 func DisableSecureBoot(name string) error {
 	script := fmt.Sprintf(
 		`Set-VMFirmware -VMName "%s" -EnableSecureBoot Off -ErrorAction Stop`,
-		textformat.EscapeForPowershell(name),
+		textformat.EscapeForPowerShell(name),
 	)
 
 	if err := execute.RunPowershell(script); err != nil {

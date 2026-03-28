@@ -27,7 +27,7 @@ import (
 
 // State returns the current state string ("Running", "Off", "Saved", ...).
 func State(name string) (string, error) {
-	script := fmt.Sprintf(`(Get-VM -VMName '%s').State`, textformat.EscapeForPowershell(name))
+	script := fmt.Sprintf(`(Get-VM -VMName '%s').State`, textformat.EscapeForPowerShell(name))
 
 	return execute.RunPowershellCapture(script)
 }

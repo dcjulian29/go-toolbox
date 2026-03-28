@@ -29,7 +29,7 @@ import (
 func DisableAutomaticCheckpoints(name string) error {
 	script := fmt.Sprintf(
 		`Set-VM -Name "%s" -AutomaticCheckpointsEnabled $false -ErrorAction Stop`,
-		textformat.EscapeForPowershell(name),
+		textformat.EscapeForPowerShell(name),
 	)
 
 	return execute.RunPowershell(script)

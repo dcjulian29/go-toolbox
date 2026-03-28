@@ -29,7 +29,7 @@ import (
 func Dismount(path string) error {
 	script := fmt.Sprintf(
 		`Dismount-VHD -Path "%s" -ErrorAction SilentlyContinue`,
-		textformat.EscapeForPowershell(path),
+		textformat.EscapeForPowerShell(path),
 	)
 
 	return execute.RunPowershell(script)

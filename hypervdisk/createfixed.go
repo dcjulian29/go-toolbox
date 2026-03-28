@@ -29,7 +29,7 @@ import (
 func CreateFixed(vhdxPath string, sizeBytes int64) error {
 	script := fmt.Sprintf(
 		`New-VHD -Path "%s" -SizeBytes %d -Fixed -ErrorAction Stop`,
-		textformat.EscapeForPowershell(vhdxPath), sizeBytes,
+		textformat.EscapeForPowerShell(vhdxPath), sizeBytes,
 	)
 
 	if err := execute.RunPowershell(script); err != nil {

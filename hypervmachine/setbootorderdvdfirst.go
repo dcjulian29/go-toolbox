@@ -32,9 +32,9 @@ func SetBootOrderDVDFirst(name string) error {
 			`$dvd = Get-VMDvdDrive -VMName "%s"; `+
 			`$hd  = Get-VMHardDiskDrive -VMName "%s"; `+
 			`Set-VMFirmware -VM $vm -BootOrder $dvd,$hd -ErrorAction Stop`,
-		textformat.EscapeForPowershell(name),
-		textformat.EscapeForPowershell(name),
-		textformat.EscapeForPowershell(name),
+		textformat.EscapeForPowerShell(name),
+		textformat.EscapeForPowerShell(name),
+		textformat.EscapeForPowerShell(name),
 	)
 
 	return execute.RunPowershell(script)

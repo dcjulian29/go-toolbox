@@ -29,7 +29,7 @@ import (
 func EnableCheckpoints(name string) error {
 	script := fmt.Sprintf(
 		`Set-VM -Name "%s" -CheckpointType Standard -ErrorAction Stop`,
-		textformat.EscapeForPowershell(name),
+		textformat.EscapeForPowerShell(name),
 	)
 
 	return execute.RunPowershell(script)

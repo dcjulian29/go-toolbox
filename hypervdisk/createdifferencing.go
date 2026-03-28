@@ -29,8 +29,8 @@ import (
 func CreateDifferencing(referencePath, vhdxPath string) error {
 	script := fmt.Sprintf(
 		`New-VHD -ParentPath "%s" -Path "%s" -Differencing -ErrorAction Stop`,
-		textformat.EscapeForPowershell(referencePath),
-		textformat.EscapeForPowershell(vhdxPath),
+		textformat.EscapeForPowerShell(referencePath),
+		textformat.EscapeForPowerShell(vhdxPath),
 	)
 
 	if err := execute.RunPowershell(script); err != nil {

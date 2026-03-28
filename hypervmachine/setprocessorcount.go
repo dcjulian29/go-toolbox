@@ -29,7 +29,7 @@ import (
 func SetProcessorCount(name string, count int) error {
 	script := fmt.Sprintf(
 		`Set-VMProcessor -VMName "%s" -Count %d -ErrorAction Stop`,
-		textformat.EscapeForPowershell(name), count,
+		textformat.EscapeForPowerShell(name), count,
 	)
 
 	return execute.RunPowershell(script)

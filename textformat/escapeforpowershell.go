@@ -1,5 +1,3 @@
-package textformat
-
 /*
 Copyright © 2026 Julian Easterling
 
@@ -16,16 +14,20 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+package textformat
+
 import (
 	"strings"
 )
 
+var psEscaper = strings.NewReplacer(
+	"`", "``",
+	"$", "`$",
+	`"`, "`\"",
+)
+
 // EscapeForPowershell wraps a string value for safe inclusion inside a PowerShell
 // double-quoted string by escaping backtick, dollar, and double-quote chars.
-func EscapeForPowershell(s string) string {
-	s = strings.ReplaceAll(s, "`", "``")
-	s = strings.ReplaceAll(s, "$", "`$")
-	s = strings.ReplaceAll(s, `"`, "`\"")
-
-	return s
+func EscapeForPowerShell(s string) string {
+	return psEscaper.Replace(s)
 }
