@@ -14,19 +14,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package docker
+package filesystem
 
-// HostAndWorkArguments returns the arguments to map the volume
-// and working directory for the Linux container.
-func HostAndWorkArguments() []string {
-	volume, work := HostContainerVolume()
+// EnsureUnixPaths converts all path arguments to Unix-style separators.
+func EnsureUnixPaths(args []string) []string {
+	result := make([]string, len(args))
 
-	args := []string{
-		"-v",
-		volume,
-		"-w",
-		work,
+	for i, arg := range args {
+		result[i] = EnsurePathIsUnix(arg)
 	}
 
-	return args
+	return result
 }

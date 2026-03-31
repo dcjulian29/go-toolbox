@@ -1,5 +1,3 @@
-package filesystem
-
 /*
 Copyright © 2026 Julian Easterling
 
@@ -16,27 +14,25 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+package filesystem
+
 import (
-	"fmt"
 	"os"
 )
 
-// AppendFile appends to a file at the specified path and writes the provided content to it.
+// AppendFile appends the provided content to the file at the specified path.
+// The file must already exist.
 func AppendFile(path string, content []byte) error {
-	if !FileExists(path) {
-		return fmt.Errorf("'%s' does not exist", path)
-	}
-
-	file, err := os.OpenFile(path, os.O_APPEND|os.O_WRONLY, 0644) //nolint
+	file, err := os.OpenFile(path, os.O_APPEND|os.O_WRONLY, ModeOwnerReadWrite)
 	if err != nil {
 		return err
 	}
 
-	defer file.Close()
+	_, err = file.Write(content)
 
-	if _, err = file.Write(content); err != nil {
-		return err
+	if closeErr := file.Close(); err == nil {
+		err = closeErr
 	}
 
-	return nil
+	return err
 }

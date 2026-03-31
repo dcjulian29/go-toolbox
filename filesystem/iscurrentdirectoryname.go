@@ -1,5 +1,3 @@
-package filesystem
-
 /*
 Copyright © 2026 Julian Easterling
 
@@ -16,15 +14,28 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+package filesystem
+
 import (
 	"os"
 	"path/filepath"
+	"runtime"
+	"strings"
 )
 
 // IsCurrentDirectoryName checks if the specified string matches the name
 // of the current working directory.
 func IsCurrentDirectoryName(name string) bool {
-	pwd, _ := os.Getwd()
+	pwd, err := os.Getwd()
+	if err != nil {
+		return false
+	}
 
-	return filepath.Base(pwd) == name
+	current := filepath.Base(pwd)
+
+	if runtime.GOOS == "windows" || runtime.GOOS == "darwin" {
+		return strings.EqualFold(current, name)
+	}
+
+	return current == name
 }

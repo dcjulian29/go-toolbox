@@ -1,5 +1,3 @@
-package filesystem
-
 /*
 Copyright © 2026 Julian Easterling
 
@@ -16,6 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+package filesystem
+
 import (
 	"errors"
 	"fmt"
@@ -25,23 +25,37 @@ import (
 	"github.com/dcjulian29/go-toolbox/textformat"
 )
 
-// FindFile searches the specified directory and its children for files that
-// match the provided naming pattern or criteria.
+// FindFile searches the current working directory and its children for a file
+// that matches the provided filename.
 func FindFile(filename string) (string, error) {
-	pwd, _ := os.Getwd()
-	absStart, err := filepath.Abs(pwd)
+	absStart, err := filepath.Abs(".")
 	if err != nil {
 		return textformat.EmptyString, fmt.Errorf("failed to resolve current directory: %w", err)
 	}
 
-	if found, err := searchChildren(filename, absStart); err == nil {
-		return found, nil
+	visited := make(map[string]bool)
+
+	found, err := searchChildren(filename, absStart, visited)
+
+	if err != nil {
+		return textformat.EmptyString, fmt.Errorf("failed to find '%s': %w", filename, err)
 	}
 
-	return textformat.EmptyString, fmt.Errorf("failed to find '%s'", filename)
+	return found, nil
 }
 
-func searchChildren(filename, dir string) (string, error) {
+func searchChildren(filename, dir string, visited map[string]bool) (string, error) {
+	realDir, err := filepath.EvalSymlinks(dir)
+	if err != nil {
+		return textformat.EmptyString, fmt.Errorf("failed to resolve path %s: %w", dir, err)
+	}
+
+	if visited[realDir] {
+		return textformat.EmptyString, errors.New("directory already visited")
+	}
+
+	visited[realDir] = true
+
 	entries, err := os.ReadDir(dir)
 	if err != nil {
 		return textformat.EmptyString, fmt.Errorf("failed to read directory %s: %w", dir, err)
@@ -50,14 +64,23 @@ func searchChildren(filename, dir string) (string, error) {
 	for _, entry := range entries {
 		fullPath := filepath.Join(dir, entry.Name())
 
-		if !entry.IsDir() {
-			if entry.Name() == filename {
-				return fullPath, nil
+		isDir := entry.IsDir()
+
+		if entry.Type()&os.ModeSymlink != 0 { //nolint
+			info, err := os.Stat(fullPath)
+			if err != nil {
+				continue
 			}
-		} else {
-			if found, err := searchChildren(filename, fullPath); err == nil {
+
+			isDir = info.IsDir()
+		}
+
+		if isDir {
+			if found, err := searchChildren(filename, fullPath, visited); err == nil {
 				return found, nil
 			}
+		} else if entry.Name() == filename {
+			return fullPath, nil
 		}
 	}
 

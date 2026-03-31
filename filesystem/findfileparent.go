@@ -1,5 +1,3 @@
-package filesystem
-
 /*
 Copyright © 2026 Julian Easterling
 
@@ -16,6 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+package filesystem
+
 import (
 	"errors"
 	"fmt"
@@ -25,11 +25,12 @@ import (
 	"github.com/dcjulian29/go-toolbox/textformat"
 )
 
-// FindFileParent searches for files matching a pattern starting from a
-// specific directory and moving upwards through its parent directories.
+// FindFileParent searches for a file matching the specified name starting
+// from the parent of the current working directory and moving upwards
+// through ancestor directories until the filesystem root is reached.
+// Directories are not matched even if they share the same name.
 func FindFileParent(filename string) (string, error) {
-	pwd, _ := os.Getwd()
-	absStart, err := filepath.Abs(pwd)
+	absStart, err := filepath.Abs(".")
 	if err != nil {
 		return textformat.EmptyString, fmt.Errorf("failed to resolve current directory: %w", err)
 	}
@@ -39,7 +40,8 @@ func FindFileParent(filename string) (string, error) {
 	for {
 		candidate := filepath.Join(current, filename)
 
-		if _, err := os.Stat(candidate); err == nil {
+		info, err := os.Stat(candidate)
+		if err == nil && !info.IsDir() {
 			return candidate, nil
 		}
 

@@ -1,5 +1,3 @@
-package filesystem
-
 /*
 Copyright © 2026 Julian Easterling
 
@@ -16,15 +14,20 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+package filesystem
+
 import (
+	"errors"
+	"io/fs"
 	"os"
 )
 
 // RemoveFile deletes the specified file from the file system.
 func RemoveFile(path string) error {
-	if FileExist(path) {
-		return os.Remove(path)
+	err := os.Remove(path)
+	if errors.Is(err, fs.ErrNotExist) {
+		return nil
 	}
 
-	return nil
+	return err
 }

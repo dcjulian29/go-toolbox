@@ -1,5 +1,3 @@
-package filesystem
-
 /*
 Copyright © 2026 Julian Easterling
 
@@ -16,22 +14,43 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+package filesystem
+
 import (
 	"fmt"
+	"os"
 	"path/filepath"
 )
 
 // SearchForFiles searches 'path' for files whose name matches the given
-// glob pattern. Returns an error if nothing is found.
+// glob pattern. Directories are excluded from results. Returns an error
+// if the path is inaccessible or nothing is found.
 func SearchForFiles(path, pattern string) ([]string, error) {
+	if _, err := os.Stat(path); err != nil {
+		return []string{}, fmt.Errorf("failed to access %q: %w", path, err)
+	}
+
 	matches, err := filepath.Glob(filepath.Join(path, pattern))
 	if err != nil {
 		return []string{}, err
 	}
 
-	if len(matches) == 0 { //nolint:revive
-		return []string{}, fmt.Errorf("no file matching '%q' found in '%s'", pattern, path)
+	files := make([]string, 0, len(matches)) //nolint:revive
+
+	for _, match := range matches {
+		info, err := os.Stat(match)
+		if err != nil {
+			continue
+		}
+
+		if !info.IsDir() {
+			files = append(files, match)
+		}
 	}
 
-	return matches, nil
+	if len(files) == 0 { //nolint:revive
+		return []string{}, fmt.Errorf("no file matching %q found in %q", pattern, path)
+	}
+
+	return files, nil
 }

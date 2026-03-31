@@ -20,14 +20,8 @@ import (
 	"os"
 )
 
-// EnsureUnixPathArguments ensures all arguments contains path separators with
-// forward slashes for use with Unix compatible uses.
+// EnsureUnixPathArguments converts all command-line arguments to Unix-style
+// path separators.
 func EnsureUnixPathArguments() []string {
-	args := os.Args[1:] //nolint
-
-	for i, arg := range args {
-		args[i] = EnsurePathIsUnix(arg)
-	}
-
-	return args
+	return EnsureUnixPaths(os.Args[1:])
 }

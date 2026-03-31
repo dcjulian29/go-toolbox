@@ -1,5 +1,3 @@
-package filesystem
-
 /*
 Copyright © 2026 Julian Easterling
 
@@ -16,23 +14,31 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+package filesystem
+
 import (
 	"io/fs"
 	"path/filepath"
+	"strings"
 )
 
 // FindFilesByExtension recursively searches a directory for all files matching
-// the given file extension.
+// the given file extension. The extension may be specified with or without a
+// leading dot (e.g., ".txt" or "txt"). Directories are excluded from results.
 func FindFilesByExtension(path, extension string) ([]string, error) {
-	var files []string
+	if !strings.HasPrefix(extension, ".") {
+		extension = "." + extension
+	}
 
-	err := filepath.WalkDir(path, func(f string, d fs.DirEntry, err error) error {
+	files := []string{}
+
+	err := filepath.WalkDir(path, func(entry string, d fs.DirEntry, err error) error {
 		if err != nil {
-			return err
+			return nil
 		}
 
-		if filepath.Ext(d.Name()) == extension {
-			files = append(files, f)
+		if !d.IsDir() && filepath.Ext(d.Name()) == extension {
+			files = append(files, entry)
 		}
 
 		return nil

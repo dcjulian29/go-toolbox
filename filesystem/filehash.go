@@ -1,5 +1,3 @@
-package filesystem
-
 /*
 Copyright © 2026 Julian Easterling
 
@@ -16,6 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+package filesystem
+
 import (
 	"crypto/sha256"
 	"encoding/hex"
@@ -25,8 +25,8 @@ import (
 	"github.com/dcjulian29/go-toolbox/textformat"
 )
 
-// FileHash computes and returns the cryptographic hash (e.g., SHA256) of
-// the specified file's contents.
+// FileHash computes and returns the SHA-256 hash of the specified file's
+// contents as a lowercase hex-encoded string.
 func FileHash(path string) (string, error) {
 	hash := sha256.New()
 

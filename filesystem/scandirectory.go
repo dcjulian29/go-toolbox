@@ -1,5 +1,3 @@
-package filesystem
-
 /*
 Copyright © 2026 Julian Easterling
 
@@ -16,39 +14,41 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+package filesystem
+
 import (
-	"os"
+	"io/fs"
 	"path/filepath"
 	"strings"
 )
 
-// ScanDirectory traverses the specified directory and performs an operation
-// or returns a list of its contents based on standard filtering criteria.
+// ScanDirectory recursively traverses the specified directory and returns
+// separate lists of directories and regular files found within it. Paths
+// containing any of the ignore strings are excluded, and ignored directories
+// are not descended into.
 func ScanDirectory(path string, ignore []string) ([]string, []string, error) {
 	folders := []string{}
 	files := []string{}
 
-	err := filepath.Walk(path, func(path string, f os.FileInfo, err error) error {
+	err := filepath.WalkDir(path, func(entry string, d fs.DirEntry, err error) error {
 		if err != nil {
-			return err
+			return nil
 		}
-
-		_continue := false
 
 		for _, i := range ignore {
-			if strings.Contains(path, i) {
-				_continue = true
+			if strings.Contains(entry, i) {
+				if d.IsDir() {
+					return filepath.SkipDir
+				}
+
+				return nil
 			}
 		}
 
-		if !_continue {
-			m := f.Mode()
-
-			if m.IsDir() {
-				folders = append(folders, path)
-			} else if m.IsRegular() {
-				files = append(files, path)
-			}
+		if d.IsDir() {
+			folders = append(folders, entry)
+		} else if d.Type().IsRegular() {
+			files = append(files, entry)
 		}
 
 		return nil

@@ -1,5 +1,3 @@
-package filesystem
-
 /*
 Copyright © 2026 Julian Easterling
 
@@ -16,6 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+package filesystem
+
 import (
 	"os"
 	"path/filepath"
@@ -28,16 +28,5 @@ func EnsureFileExist(path string, content []byte) error {
 		return err
 	}
 
-	file, err := os.Create(path)
-	if err != nil {
-		return err
-	}
-
-	defer file.Close()
-
-	if _, err = file.Write(content); err != nil {
-		return err
-	}
-
-	return nil
+	return os.WriteFile(path, content, FileModeReadable)
 }

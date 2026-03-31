@@ -26,7 +26,19 @@ const (
 	// for executable files and directories (typically 0755).
 	FileModeExecutable os.FileMode = 0o755 // rwxr-xr-x — directories, scripts
 
+	// FileModePrivate represents the standard octal file permission mode
+	// for readable files only by the user  (typically 0600).
+	FileModePrivate os.FileMode = 0o600 // rw------- — regular files
+
 	// FileModeReadable represents the standard octal file permission mode
 	// for readable files (typically 0644).
 	FileModeReadable os.FileMode = 0o644 // rw-r--r-- — regular files
+
+	// FileModeReadOnly represents the standard octal file permission mode
+	// for read only files.  (r--r--r-- for regular files)
+	FileModeReadOnly os.FileMode = 0o444
+
+	// ModeOwnerReadWrite represents a regular file permission that is readable and
+	// writeable by the Owner. (rw-r--r--)
+	ModeOwnerReadWrite os.FileMode = 0o644
 )

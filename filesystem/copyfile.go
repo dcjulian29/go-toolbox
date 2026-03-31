@@ -1,5 +1,3 @@
-package filesystem
-
 /*
 Copyright © 2026 Julian Easterling
 
@@ -16,29 +14,25 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+package filesystem
+
 import (
-	"errors"
 	"fmt"
 	"io"
 	"os"
-	"path/filepath"
 )
 
 // CopyFile duplicates a file from the source path to the destination path,
-// preserving the original file permissions and contents.
+// preserving the original file permissions and contents. If the destination
+// file already exists, it is overwritten.
 func CopyFile(src, dst string) error {
-	if !FileExist(src) {
-		return fmt.Errorf("source file '%s' does not exists", src)
+	info, err := os.Stat(src)
+	if err != nil {
+		return fmt.Errorf("source file %q: %w", src, err)
 	}
 
-	if !DirectoryExist(filepath.Dir(dst)) {
-		return errors.New("destination directory does not exist")
-	}
-
-	if FileExist(dst) {
-		if err := os.Remove(dst); err != nil {
-			return err
-		}
+	if info.IsDir() {
+		return fmt.Errorf("source %q is a directory, not a file", src)
 	}
 
 	source, err := os.Open(src)
@@ -46,16 +40,18 @@ func CopyFile(src, dst string) error {
 		return err
 	}
 
-	defer source.Close() //nolint
+	defer source.Close()
 
-	destination, err := os.Create(dst)
+	destination, err := os.OpenFile(dst, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, info.Mode())
 	if err != nil {
 		return err
 	}
 
-	defer destination.Close() //nolint
-
 	_, err = io.Copy(destination, source)
+
+	if closeErr := destination.Close(); err == nil {
+		err = closeErr
+	}
 
 	return err
 }

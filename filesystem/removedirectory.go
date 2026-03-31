@@ -1,5 +1,3 @@
-package filesystem
-
 /*
 Copyright © 2026 Julian Easterling
 
@@ -16,29 +14,28 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+package filesystem
+
 import (
+	"fmt"
 	"os"
-	"path/filepath"
 )
 
 // RemoveDirectory completely deletes the specified directory and all of
 // its contents from the file system.
 func RemoveDirectory(path string) error {
-	if DirectoryExist(path) {
-		files, err := filepath.Glob(filepath.Join(path, "*"))
-		if err != nil {
-			return err
+	info, err := os.Stat(path)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil
 		}
 
-		for _, file := range files {
-			err := os.RemoveAll(file)
-			if err != nil {
-				return err
-			}
-		}
-
-		return os.Remove(path)
+		return err
 	}
 
-	return nil
+	if !info.IsDir() {
+		return fmt.Errorf("'%s' is not a directory", path)
+	}
+
+	return os.RemoveAll(path)
 }
