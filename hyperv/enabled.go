@@ -1,7 +1,5 @@
 //go:build windows
 
-package hyperv
-
 /*
 Copyright © 2026 Julian Easterling
 
@@ -18,24 +16,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import (
-	"fmt"
+package hyperv
 
-	"github.com/dcjulian29/go-toolbox/execute"
-)
-
-// Enabled returns an error if the Hyper-V role is not available.
-func Enabled() error {
-	out, err := execute.RunPowershellCapture(
-		`(Get-WindowsOptionalFeature -Online -FeatureName Microsoft-Hyper-V).State`,
-	)
-	if err != nil {
-		return fmt.Errorf("could not query Hyper-V feature state: %w", err)
-	}
-
-	if out != "Enabled" {
-		return fmt.Errorf("the Hyper-V feature is not enabled on this host (state: %s)", out)
-	}
-
-	return nil
+// Enabled reports whether the Hyper-V role is available on this host.
+func Enabled() bool {
+	return EnsureEnabled() == nil
 }

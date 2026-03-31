@@ -1,7 +1,5 @@
 //go:build windows
 
-package hyperv
-
 /*
 Copyright © 2026 Julian Easterling
 
@@ -18,16 +16,25 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+package hyperv
+
 import (
+	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/dcjulian29/go-toolbox/execute"
 	"github.com/dcjulian29/go-toolbox/textformat"
 )
 
-// OpenConsole opens the Hyper-V Virtual Machine Connection console.
+// OpenConsole opens the Hyper-V Virtual Machine Connection console for the
+// named virtual machine.
 func OpenConsole(name string) error {
+	if strings.TrimSpace(name) == "" {
+		return errors.New("virtual machine name must not be empty")
+	}
+
 	script := fmt.Sprintf(`vmconnect.exe localhost "%s"`, textformat.EscapeForPowerShell(name))
 
-	return execute.RunPowershell(script)
+	return execute.RunPowerShell(script)
 }
