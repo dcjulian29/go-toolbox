@@ -1,7 +1,5 @@
 //go:build windows
 
-package elevation
-
 /*
 Copyright © 2026 Julian Easterling
 
@@ -18,7 +16,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+package elevation
+
 import (
+	"errors"
+	"fmt"
 	"os"
 	"strings"
 	"syscall"
@@ -45,11 +47,12 @@ func RelaunchElevated() error {
 
 	var sb strings.Builder
 
-	if len(os.Args) > 1 { //nolint
-		for _, a := range os.Args[1:] { //nolint
+	for i, a := range os.Args[1:] { //nolint:revive
+		if i > 0 { //nolint:revive
 			sb.WriteString(" ")
-			sb.WriteString(a)
 		}
+
+		sb.WriteString(a)
 	}
 
 	var argsPtr *uint16
@@ -66,17 +69,43 @@ func RelaunchElevated() error {
 	shellExec := shell32.NewProc("ShellExecuteW")
 
 	r, _, _ := shellExec.Call(
-		0, //nolint
+		0, //nolint:revive
 		uintptr(unsafe.Pointer(verb)),
 		uintptr(unsafe.Pointer(exePtr)),
 		uintptr(unsafe.Pointer(argsPtr)),
-		0, //nolint
+		0, //nolint:revive
 		syscall.SW_SHOWNORMAL,
 	)
 
-	if r <= 32 { //nolint
-		return syscall.EINVAL
+	if r <= 32 { //nolint:revive
+		return shellExecuteError(r)
 	}
 
 	return nil
+}
+
+// nolint
+func shellExecuteError(code uintptr) error {
+	switch code {
+	case 0:
+		return errors.New("ShellExecuteW: out of memory")
+	case 2:
+		return errors.New("ShellExecuteW: file not found")
+	case 3:
+		return errors.New("ShellExecuteW: path not found")
+	case 5:
+		return errors.New("ShellExecuteW: access denied")
+	case 8:
+		return errors.New("ShellExecuteW: out of memory")
+	case 26:
+		return errors.New("ShellExecuteW: sharing violation")
+	case 27:
+		return errors.New("ShellExecuteW: invalid file association")
+	case 31:
+		return errors.New("ShellExecuteW: no application associated with file type")
+	case 32:
+		return errors.New("ShellExecuteW: DDE transaction failed")
+	default:
+		return fmt.Errorf("ShellExecuteW failed with code %d", code)
+	}
 }
