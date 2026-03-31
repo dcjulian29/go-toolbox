@@ -20,14 +20,14 @@ import (
 	"strings"
 )
 
-var psEscaper = strings.NewReplacer(
-	"`", "``",
-	"$", "`$",
-	`"`, "`\"",
-)
-
-// EscapeForPowershell wraps a string value for safe inclusion inside a PowerShell
+// EscapeForPowerShell wraps a string value for safe inclusion inside a PowerShell
 // double-quoted string by escaping backtick, dollar, and double-quote chars.
 func EscapeForPowerShell(s string) string {
+	psEscaper := strings.NewReplacer(
+		"`", "``",
+		"$", "`$",
+		`"`, "`\"",
+	)
+
 	return psEscaper.Replace(s)
 }

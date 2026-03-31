@@ -1,5 +1,3 @@
-package textformat
-
 /*
 Copyright © 2026 Julian Easterling
 
@@ -16,17 +14,53 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+package textformat
+
 import (
 	"strings"
 )
 
-// XMLEscape escapes the five predefined XML entities in s.
+// XMLEscape escapes the five predefined XML entities in s. The function is
+// idempotent — already-escaped entities are not double-escaped.
 func XMLEscape(s string) string {
-	s = strings.ReplaceAll(s, "&", "&amp;")
-	s = strings.ReplaceAll(s, "<", "&lt;")
-	s = strings.ReplaceAll(s, ">", "&gt;")
-	s = strings.ReplaceAll(s, `"`, "&quot;")
-	s = strings.ReplaceAll(s, "'", "&apos;")
+	var b strings.Builder
+	b.Grow(len(s))
 
-	return s
+	for i := 0; i < len(s); i++ { //nolint:revive
+		switch s[i] {
+		case '&':
+			if isXMLEntity(s[i:]) {
+				end := strings.IndexByte(s[i:], ';')
+				b.WriteString(s[i : i+end+1])
+				i += end
+			} else {
+				b.WriteString("&amp;")
+			}
+
+		case '<':
+			b.WriteString("&lt;")
+
+		case '>':
+			b.WriteString("&gt;")
+
+		case '"':
+			b.WriteString("&quot;")
+
+		case '\'':
+			b.WriteString("&apos;")
+
+		default:
+			b.WriteByte(s[i])
+		}
+	}
+
+	return b.String()
+}
+
+func isXMLEntity(s string) bool {
+	return strings.HasPrefix(s, "&amp;") ||
+		strings.HasPrefix(s, "&lt;") ||
+		strings.HasPrefix(s, "&gt;") ||
+		strings.HasPrefix(s, "&quot;") ||
+		strings.HasPrefix(s, "&apos;")
 }
