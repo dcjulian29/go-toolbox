@@ -1,5 +1,3 @@
-package network
-
 /*
 Copyright © 2026 Julian Easterling
 
@@ -16,37 +14,44 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+package network
+
 import (
+	"context"
 	"net"
 	"os/exec"
 	"runtime"
-	"strings"
+	"time"
 )
 
 // Ping sends an ICMP echo request to the specified target host to verify
-// network connectivity, returning an error if the host is unreachable.
+// network connectivity, returning true if the host is reachable.
 func Ping(address string) bool {
+	if address == "" {
+		return false
+	}
+
 	addr, err := net.ResolveIPAddr("ip", address)
 	if err != nil {
 		return false
 	}
 
-	ip := net.ParseIP(addr.String())
-	if ip == nil {
-		return false
+	ip := addr.String()
+
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+
+	var cmd *exec.Cmd
+
+	//nolint: revive
+	switch runtime.GOOS {
+	case "windows":
+		cmd = exec.CommandContext(ctx, "ping", "-w", "1000", "-n", "1", ip) // #nosec G204
+	case "darwin":
+		cmd = exec.CommandContext(ctx, "ping", "-c", "1", "-t", "1", ip) // #nosec G204
+	default:
+		cmd = exec.CommandContext(ctx, "ping", "-c", "1", "-W", "1", ip) // #nosec G204
 	}
 
-	var output []byte
-
-	if runtime.GOOS == "windows" {
-		output, _ = exec.Command("ping", "-w", "1000", "-n", "1", ip.String()).CombinedOutput() // #nosec G204
-	} else {
-		output, _ = exec.Command("ping", "-c", "1", ip.String()).CombinedOutput() // #nosec G204
-	}
-
-	if strings.Contains(string(output[:]), "TTL") {
-		return true
-	}
-
-	return false
+	return cmd.Run() == nil
 }
