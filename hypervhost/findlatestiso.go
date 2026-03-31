@@ -1,7 +1,5 @@
 //go:build windows
 
-package hypervhost
-
 /*
 Copyright © 2026 Julian Easterling
 
@@ -18,38 +16,38 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+package hypervhost
+
 import (
+	"errors"
 	"fmt"
 	"path/filepath"
+	"slices"
+	"strings"
 
-	"github.com/dcjulian29/go-toolbox/filesystem"
 	"github.com/dcjulian29/go-toolbox/textformat"
 )
 
-// FindLatestISO searches directoryPath for an ISO whose name matches
-// the pattern and returns the full path of the alphabetically last match
+// FindLatestISO searches directoryPath for an ISO file whose name starts with
+// the given prefix and returns the full path of the alphabetically last match
 // (which is usually the newest dated image).
 func FindLatestISO(directoryPath, pattern string) (string, error) {
-	matches, err := filepath.Glob(filepath.Join(directoryPath, pattern))
+	if strings.TrimSpace(directoryPath) == "" {
+		return textformat.EmptyString, errors.New("directory path must not be empty")
+	}
+
+	if strings.TrimSpace(pattern) == "" {
+		return textformat.EmptyString, errors.New("pattern must not be empty")
+	}
+
+	matches, err := filepath.Glob(filepath.Join(directoryPath, pattern+"*.iso"))
 	if err != nil {
 		return textformat.EmptyString, err
 	}
 
-	if len(matches) == 0 { //nolint
-		return textformat.EmptyString, fmt.Errorf("no ISO matching '%q' found in '%s'", pattern, directoryPath)
+	if len(matches) == 0 { //nolint:revive
+		return textformat.EmptyString, fmt.Errorf("no ISO matching %q found in %q", pattern, directoryPath)
 	}
 
-	latest := matches[0] //nolint
-
-	for _, m := range matches[1:] { //nolint
-		if m > latest {
-			latest = m
-		}
-	}
-
-	if !filesystem.FileExist(latest) {
-		return textformat.EmptyString, fmt.Errorf("ISO %q not found", latest) //nolint
-	}
-
-	return latest, nil
+	return slices.Max(matches), nil
 }

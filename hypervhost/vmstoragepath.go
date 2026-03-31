@@ -1,7 +1,5 @@
 //go:build windows
 
-package hypervhost
-
 /*
 Copyright © 2026 Julian Easterling
 
@@ -18,8 +16,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+package hypervhost
+
 import (
+	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/dcjulian29/go-toolbox/execute"
 	"github.com/dcjulian29/go-toolbox/textformat"
@@ -27,10 +29,16 @@ import (
 
 // VMStoragePath returns the configured VM storage path from the Hyper-V host.
 func VMStoragePath() (string, error) {
-	script := `(Get-VMHost).VirtualHardDiskPath`
-	path, err := execute.RunPowershellCapture(script)
+	script := `(Get-VMHost -ErrorAction Stop).VirtualHardDiskPath`
+	path, err := execute.RunPowerShellCapture(script)
 	if err != nil {
 		return textformat.EmptyString, fmt.Errorf("retrieving default hard disk path: %w", err)
+	}
+
+	path = strings.TrimSpace(path)
+
+	if path == "" {
+		return "", errors.New("Hyper-V host returned an empty storage path")
 	}
 
 	return path, nil

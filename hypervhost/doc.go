@@ -1,6 +1,3 @@
-// Package hypervhost provides functions to interact with the Hyper-V host
-package hypervhost
-
 /*
 Copyright © 2026 Julian Easterling
 
@@ -16,3 +13,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+
+// Package hypervhost provides functions to interact with the Hyper-V host
+package hypervhost
