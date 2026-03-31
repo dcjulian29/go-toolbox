@@ -47,10 +47,9 @@ type ContainerOptions struct {
 	// docker run --hostname.
 	HostName string
 
-	// AdditionalArgs contains any extra raw arguments to append to the
+	// AdditionalArgs contains any extra container arguments to append to the
 	// docker run command that are not covered by the other fields.
-	// Arguments are split on whitespace before being passed to the CLI.
-	AdditionalArgs string
+	AdditionalArgs []string
 
 	// Image is the Docker image to run. Required.
 	Image string

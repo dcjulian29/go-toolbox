@@ -1,18 +1,41 @@
+/*
+Copyright © 2026 Julian Easterling
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+	http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package docker
 
 import (
+	"errors"
 	"fmt"
+	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/dcjulian29/go-toolbox/execute"
 	"github.com/dcjulian29/go-toolbox/filesystem"
 	"github.com/dcjulian29/go-toolbox/textformat"
 )
 
-// Run builds and executes a `docker run` command based on the
-// provided options. It returns the combined output and any error encountered.
+// Run builds and executes a docker run command from the provided options.
+// When opts.Capture is true the container's stdout is returned as a trimmed
+// string; otherwise stdout and stderr are streamed to the terminal and an
+// empty string is returned.
 func Run(opts ContainerOptions) (string, error) {
+	if opts.Image == textformat.EmptyString {
+		return textformat.EmptyString, errors.New("image is required")
+	}
+
 	if opts.Tag == textformat.EmptyString {
 		opts.Tag = "latest"
 	}
@@ -38,7 +61,7 @@ func Run(opts ContainerOptions) (string, error) {
 		return execute.ExternalProgramCapture("docker", args...)
 	}
 
-	return textformat.EmptyString, execute.ExternalProgram("docker", args...) //nolint
+	return textformat.EmptyString, execute.ExternalProgram("docker", args...)
 }
 
 func commandArguments(opts ContainerOptions) []string {
@@ -48,8 +71,8 @@ func commandArguments(opts ContainerOptions) []string {
 		args = append(args, opts.Command)
 	}
 
-	if opts.AdditionalArgs != textformat.EmptyString {
-		args = append(args, strings.Fields(opts.AdditionalArgs)...)
+	if len(opts.AdditionalArgs) > 0 { //nolint:revive
+		args = append(args, opts.AdditionalArgs...)
 	}
 
 	return args
@@ -75,7 +98,7 @@ func containerArguments(opts ContainerOptions) []string {
 	}
 
 	if opts.User != textformat.EmptyString {
-		args = append(args, "--user="+opts.User)
+		args = append(args, "--user", opts.User)
 	}
 
 	if opts.WorkingDirectory != textformat.EmptyString {
@@ -96,7 +119,17 @@ func entryArguments(opts ContainerOptions) (args []string, entryVolume []string,
 
 	abs, err := filepath.Abs(opts.EntryScript)
 	if err != nil {
-		return nil, nil, fmt.Errorf("resolving absolute directory of EntryScript: %w", err)
+		return nil, nil, fmt.Errorf("resolving absolute path of EntryScript: %w", err)
+	}
+
+	info, err := os.Stat(abs)
+
+	if err != nil {
+		return nil, nil, err
+	}
+
+	if info.IsDir() {
+		return nil, nil, errors.New("path is a directory not a file")
 	}
 
 	filename := filepath.Base(opts.EntryScript)

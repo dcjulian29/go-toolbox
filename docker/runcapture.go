@@ -22,20 +22,25 @@ import (
 	"github.com/dcjulian29/go-toolbox/filesystem"
 )
 
-// RunCapture runs the docker container with the given parameters
-// and captures its standard output returning the result as a string.
-// If there is output to standard error, return that as an error.
-// Deprecated: Use github.com/dcjulian29/go-toolbox/docker
-// Run function and ContainerOptions instead.
+// RunCapture runs the docker container with the given parameters and captures
+// its standard output, returning the result as a string. If there is output to
+// standard error, it is returned as an error.
+//
+// Deprecated: Use [Run] with [ContainerOptions] instead.
 func RunCapture(image, tag, envPrefix string) (string, error) {
+	data, work, err := HostContainerVolume()
+	if err != nil {
+		return "", err
+	}
+
 	opts := ContainerOptions{
-		Keep:                 false,
+		Capture:              true,
+		Command:              strings.Join(filesystem.EnsureUnixPathArguments(), " "),
 		EnvironmentVariables: EnvironmentVariablesWithPrefix(envPrefix),
-		AdditionalArgs:       strings.Join(HostAndWorkArguments(), " "),
 		Image:                image,
 		Tag:                  tag,
-		Command:              strings.Join(filesystem.EnsureUnixPathArguments(), " "),
-		Capture:              true,
+		Volumes:              []string{data},
+		WorkingDirectory:     work,
 	}
 
 	return Run(opts)

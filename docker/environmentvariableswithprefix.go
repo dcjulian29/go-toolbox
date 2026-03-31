@@ -29,14 +29,6 @@ func EnvironmentVariablesWithPrefix(prefix string) map[string]string {
 	return findEnvironmentVariables(prefix, false)
 }
 
-// EnvironmentVariablesWithStrippedPrefix scans the host environment for
-// variables with the given prefix and returns them as a map compatible with
-// ContainerOptions.EnvironmentVariables. The prefix is removed from each
-// returned key (e.g. "APP_DB_HOST" → "DB_HOST").
-func EnvironmentVariablesWithStrippedPrefix(prefix string) map[string]string {
-	return findEnvironmentVariables(prefix, true)
-}
-
 func findEnvironmentVariables(prefix string, stripPrefix bool) map[string]string { //nolint
 	if !strings.HasSuffix(prefix, "_") {
 		prefix += "_"

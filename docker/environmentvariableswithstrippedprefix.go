@@ -16,14 +16,10 @@ limitations under the License.
 
 package docker
 
-import (
-	"github.com/dcjulian29/go-toolbox/filesystem"
-)
-
-// NormalizeArguments normalizes arguments to replace Windows backslash
-// path separators with forward slashes for use inside the Linux container.
-// Deprecated: Use github.com/dcjulian29/go-toolbox/filesystem
-// EnsureUnixPathArguments function instead.
-func NormalizeArguments() []string {
-	return filesystem.EnsureUnixPathArguments()
+// EnvironmentVariablesWithStrippedPrefix scans the host environment for
+// variables with the given prefix and returns them as a map compatible with
+// ContainerOptions.EnvironmentVariables. The prefix is removed from each
+// returned key (e.g. "APP_DB_HOST" → "DB_HOST").
+func EnvironmentVariablesWithStrippedPrefix(prefix string) map[string]string {
+	return findEnvironmentVariables(prefix, true)
 }

@@ -19,23 +19,42 @@ package docker
 import (
 	"fmt"
 	"os"
+	"runtime"
 	"strings"
 )
 
-// HostContainerVolume normalizes the working directory path by replacing Windows
-// backslash path separators with forward slashes for use inside the Linux container
-// and returns the volume mapping to replicate the host path inside the container
-// and the working directory inside the Linux container.
-func HostContainerVolume() (string, string) {
-	pwd, _ := os.Getwd()
-	pwd = strings.ReplaceAll(strings.ReplaceAll(pwd, "\\", "/"), ":", "")
+// HostContainerVolume maps the current working directory into a docker container
+// volume. On Windows it translates the drive-letter path into a forward-slash
+// container path (e.g. "C:\Users\dev\project" → volume "C:\:/C", work
+// "/C/Users/dev/project"). On Linux and macOS the host root is mapped directly
+// (volume "/:/", work is the current directory unchanged).
+//
+// Returns the volume argument, the container working directory, and any error
+// encountered while determining the current directory.
+func HostContainerVolume() (string, string, error) {
+	pwd, err := os.Getwd()
+	if err != nil {
+		return "", "", fmt.Errorf("unable to determine working directory: %w", err)
+	}
 
-	host := fmt.Sprintf("%s:\\", string(pwd[0]))    //nolint
-	container := fmt.Sprintf("/%s", string(pwd[0])) //nolint
+	if runtime.GOOS == "windows" {
+		return windowsContainerVolume(pwd)
+	}
 
-	data := pwd[2:] //nolint
+	return "/:/", pwd, nil
+}
 
-	work := fmt.Sprintf("%s/%s", container, data)
+func windowsContainerVolume(pwd string) (string, string, error) {
+	if len(pwd) < 3 || pwd[1] != ':' || (pwd[2] != '\\' && pwd[2] != '/') { //nolint:revive
+		return "", "", fmt.Errorf("expected a Windows drive-letter path, got %q", pwd) //nolint:revive
+	}
 
-	return fmt.Sprintf("%s:%s", host, container), work
+	drive := string(pwd[0])
+	rest := strings.ReplaceAll(pwd[3:], "\\", "/")
+
+	host := drive + ":\\"
+	container := "/" + drive
+	work := fmt.Sprintf("%s/%s", container, rest)
+
+	return fmt.Sprintf("%s:%s", host, container), work, nil
 }

@@ -25,19 +25,24 @@ import (
 // RunInteractive runs the docker container with the given parameters,
 // binding its standard input, output, and error streams directly to
 // the host OS standard streams.
-// Deprecated: Use github.com/dcjulian29/go-toolbox/docker
-// Run function and ContainerOptions instead.
+//
+// Deprecated: Use [Run] with [ContainerOptions] instead.
 func RunInteractive(image, tag, envPrefix string) error {
-	opts := ContainerOptions{
-		Keep:                 false,
-		EnvironmentVariables: EnvironmentVariablesWithPrefix(envPrefix),
-		AdditionalArgs:       strings.Join(HostAndWorkArguments(), " "),
-		Image:                image,
-		Tag:                  tag,
-		Command:              strings.Join(filesystem.EnsureUnixPathArguments(), " "),
+	data, work, err := HostContainerVolume()
+	if err != nil {
+		return err
 	}
 
-	_, err := Run(opts)
+	opts := ContainerOptions{
+		Command:              strings.Join(filesystem.EnsureUnixPathArguments(), " "),
+		EnvironmentVariables: EnvironmentVariablesWithPrefix(envPrefix),
+		Image:                image,
+		Tag:                  tag,
+		Volumes:              []string{data},
+		WorkingDirectory:     work,
+	}
+
+	_, err = Run(opts)
 
 	return err
 }
