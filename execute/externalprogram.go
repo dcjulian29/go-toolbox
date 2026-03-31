@@ -1,5 +1,3 @@
-package execute
-
 /*
 Copyright © 2026 Julian Easterling
 
@@ -16,15 +14,19 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+package execute
+
 import (
 	"os"
 	"os/exec"
 )
 
 // ExternalProgram runs the specified external program with the given parameters,
-// binding its standard input, output, and error streams directly to the host OS standard streams.
+// binding its standard input, output, and error streams directly to the host OS
+// standard streams. The returned error is *exec.ExitError if the program exits
+// with a non-zero status, or *exec.Error if the program cannot be found.
 func ExternalProgram(program string, params ...string) error {
-	cmd := exec.Command(program, params...)
+	cmd := exec.Command(program, params...) // #nosec G204
 	cmd.Stderr = os.Stderr
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout

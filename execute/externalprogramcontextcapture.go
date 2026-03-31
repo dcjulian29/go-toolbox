@@ -18,25 +18,24 @@ package execute
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"os/exec"
 	"strings"
-
-	"github.com/dcjulian29/go-toolbox/textformat"
 )
 
-// ExternalProgramCapture runs the specified external program with the given
-// parameters and captures its standard output, returning the result as a
+// ExternalProgramContextCapture runs the specified external program with the
+// given parameters and captures its standard output, returning the result as a
 // trimmed string. If the command fails, stderr output is included in the error.
 // Standard error output is discarded on success.
-func ExternalProgramCapture(program string, params ...string) (string, error) {
+func ExternalProgramContextCapture(ctx context.Context, program string, params ...string) (string, error) {
 	var out, errBuf bytes.Buffer
 
-	cmd := exec.Command(program, params...)
+	cmd := exec.CommandContext(ctx, program, params...) // #nosec G204
 	cmd.Stdout = &out
 	cmd.Stderr = &errBuf
 	if err := cmd.Run(); err != nil {
-		return textformat.EmptyString, fmt.Errorf("%w\n%s", err, errBuf.String())
+		return "", fmt.Errorf("%w\n%s", err, errBuf.String())
 	}
 
 	return strings.TrimSpace(out.String()), nil

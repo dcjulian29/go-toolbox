@@ -1,5 +1,3 @@
-package execute
-
 /*
 Copyright © 2026 Julian Easterling
 
@@ -16,28 +14,27 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import (
-	"bytes"
-	"fmt"
-	"os/exec"
-	"strings"
+package execute
 
-	"github.com/dcjulian29/go-toolbox/textformat"
+import (
+	"errors"
+	"strings"
 )
 
-// RunPowershellCapture executes a PowerShell command and captures its combined
-// standard output returning the result as a string. If there is output to
-// standard error, return that as an error.
-func RunPowershellCapture(command string) (string, error) {
-	var out, errBuf bytes.Buffer
-
-	cmd := exec.Command("powershell", "-NoProfile", "-NonInteractive",
-		"-ExecutionPolicy", "Bypass", "-Command", command)
-	cmd.Stdout = &out
-	cmd.Stderr = &errBuf
-	if err := cmd.Run(); err != nil {
-		return textformat.EmptyString, fmt.Errorf("%w\n%s", err, errBuf.String())
+// RunPowerShellCapture executes a PowerShell command and captures its standard
+// output, returning the result as a trimmed string. If the command fails,
+// stderr output is included in the error. Standard error output is discarded
+// on success.
+func RunPowerShellCapture(command string) (string, error) {
+	if strings.TrimSpace(command) == "" {
+		return "", errors.New("command must not be empty")
 	}
 
-	return strings.TrimSpace(out.String()), nil
+	shell, err := findPowerShell()
+	if err != nil {
+		return "", err //nolint:revive
+	}
+
+	return ExternalProgramCapture(shell, "-NoProfile", "-NonInteractive",
+		"-ExecutionPolicy", "Bypass", "-Command", command)
 }

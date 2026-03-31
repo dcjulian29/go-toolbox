@@ -14,26 +14,22 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package docker
+package execute
 
 import (
+	"context"
 	"os"
-	"strings"
+	"os/exec"
 )
 
-// EnvironmentVariables scans the host environment variables to find
-// variables prefixed with the provided string to pass into the container.
-// Deprecated: Use github.com/dcjulian29/go-toolbox/docker
-// EnvironmentVariablesWithPrefix function and ContainerOptions instead.
-func EnvironmentVariables(prefix string) []string {
-	env := []string{}
+// ExternalProgramContext runs the specified external program with the given parameters,
+// binding its standard input, output, and error streams directly to the host OS standard
+// streams. If the context is cancelled or its deadline expires, the process is killed.
+func ExternalProgramContext(ctx context.Context, program string, params ...string) error {
+	cmd := exec.CommandContext(ctx, program, params...) // #nosec G204
+	cmd.Stderr = os.Stderr
+	cmd.Stdin = os.Stdin
+	cmd.Stdout = os.Stdout
 
-	for _, e := range os.Environ() {
-		if strings.HasPrefix(e, prefix) {
-			env = append(env, "-e")
-			env = append(env, e)
-		}
-	}
-
-	return env
+	return cmd.Run()
 }

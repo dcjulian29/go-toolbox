@@ -1,5 +1,3 @@
-package execute
-
 /*
 Copyright © 2026 Julian Easterling
 
@@ -16,17 +14,43 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+package execute
+
 import (
+	"errors"
 	"os/exec"
+	"runtime"
+	"strings"
 )
 
-// RunPowershell executes a PowerShell command and streams stdout/stderr to the
-// caller's terminal.  An error is returned if the exit code is non-zero.
-func RunPowershell(command string) error {
-	cmd := exec.Command("powershell", "-NoProfile", "-NonInteractive",
-		"-ExecutionPolicy", "Bypass", "-Command", command)
-	cmd.Stderr = nil
-	cmd.Stdout = nil
+// RunPowerShell executes a PowerShell command and streams stdout/stderr to the
+// caller's terminal. It prefers pwsh (PowerShell Core) and falls back to
+// powershell on Windows. An error is returned if PowerShell is not available
+// or the command exits with a non-zero status.
+func RunPowerShell(command string) error {
+	if strings.TrimSpace(command) == "" {
+		return errors.New("command must not be empty")
+	}
 
-	return cmd.Run()
+	shell, err := findPowerShell()
+	if err != nil {
+		return err
+	}
+
+	return ExternalProgram(shell, "-NoProfile", "-NonInteractive",
+		"-ExecutionPolicy", "Bypass", "-Command", command)
+}
+
+func findPowerShell() (string, error) {
+	if path, err := exec.LookPath("pwsh"); err == nil {
+		return path, nil
+	}
+
+	if runtime.GOOS == "windows" {
+		if path, err := exec.LookPath("powershell"); err == nil {
+			return path, nil
+		}
+	}
+
+	return "", errors.New("PowerShell is not installed or available")
 }

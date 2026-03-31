@@ -1,5 +1,3 @@
-package execute
-
 /*
 Copyright © 2026 Julian Easterling
 
@@ -16,24 +14,31 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+package execute
+
 import (
+	"bytes"
+	"fmt"
 	"os"
 	"os/exec"
-
-	"github.com/dcjulian29/go-toolbox/textformat"
+	"strings"
 )
 
-// ExternalProgramEnvCapture runs the specified external program with the given parameters
-// and additional environment variables, capturing and returning its combined output as a string.
+// ExternalProgramEnvCapture runs the specified external program with the given
+// parameters and additional environment variables, capturing its standard output
+// and returning the result as a trimmed string. If the command fails, stderr
+// output is included in the error. Standard error output is discarded on success.
 func ExternalProgramEnvCapture(program string, env []string, params ...string) (string, error) {
-	cmd := exec.Command(program, params...)
-	cmd.Stdin = os.Stdin
+	var out, errBuf bytes.Buffer
+
+	cmd := exec.Command(program, params...) // #nosec G204
+	cmd.Stdout = &out
+	cmd.Stderr = &errBuf
 	cmd.Env = append(os.Environ(), env...)
 
-	output, err := cmd.CombinedOutput()
-	if err != nil {
-		return textformat.EmptyString, err
+	if err := cmd.Run(); err != nil {
+		return "", fmt.Errorf("%w\n%s", err, errBuf.String())
 	}
 
-	return string(output[:]), nil
+	return strings.TrimSpace(out.String()), nil
 }
