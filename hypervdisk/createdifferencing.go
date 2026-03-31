@@ -1,7 +1,5 @@
 //go:build windows
 
-package hypervdisk
-
 /*
 Copyright © 2026 Julian Easterling
 
@@ -18,22 +16,35 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+package hypervdisk
+
 import (
+	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/dcjulian29/go-toolbox/execute"
 	"github.com/dcjulian29/go-toolbox/textformat"
 )
 
-// CreateDifferencing creates a differencing VHDX.
+// CreateDifferencing creates a differencing VHDX disk at vhdxPath linked to the
+// parent disk at referencePath.
 func CreateDifferencing(referencePath, vhdxPath string) error {
+	if strings.TrimSpace(referencePath) == "" {
+		return errors.New("reference path must not be empty")
+	}
+
+	if strings.TrimSpace(vhdxPath) == "" {
+		return errors.New("VHDX path must not be empty")
+	}
+
 	script := fmt.Sprintf(
 		`New-VHD -ParentPath "%s" -Path "%s" -Differencing -ErrorAction Stop`,
 		textformat.EscapeForPowerShell(referencePath),
 		textformat.EscapeForPowerShell(vhdxPath),
 	)
 
-	if err := execute.RunPowershell(script); err != nil {
+	if err := execute.RunPowerShell(script); err != nil {
 		return fmt.Errorf("creating differencing VHDX: %w", err)
 	}
 

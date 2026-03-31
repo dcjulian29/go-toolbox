@@ -1,7 +1,5 @@
 //go:build windows
 
-package hypervdisk
-
 /*
 Copyright © 2026 Julian Easterling
 
@@ -18,21 +16,34 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+package hypervdisk
+
 import (
+	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/dcjulian29/go-toolbox/execute"
 	"github.com/dcjulian29/go-toolbox/textformat"
 )
 
-// CreateFixed creates a new fixed-size VHDX with the given size.
+// CreateFixed creates a new fixed-size VHDX file at the given path
+// with the specified size in bytes.
 func CreateFixed(vhdxPath string, sizeBytes int64) error {
+	if strings.TrimSpace(vhdxPath) == "" {
+		return errors.New("VHDX path must not be empty")
+	}
+
+	if sizeBytes <= 0 { //nolint:revive
+		return errors.New("size must be greater than zero")
+	}
+
 	script := fmt.Sprintf(
 		`New-VHD -Path "%s" -SizeBytes %d -Fixed -ErrorAction Stop`,
 		textformat.EscapeForPowerShell(vhdxPath), sizeBytes,
 	)
 
-	if err := execute.RunPowershell(script); err != nil {
+	if err := execute.RunPowerShell(script); err != nil {
 		return fmt.Errorf("creating fixed VHDX: %w", err)
 	}
 

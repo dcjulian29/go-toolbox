@@ -1,4 +1,4 @@
-package hypervdisk
+//go:build windows
 
 /*
 Copyright © 2026 Julian Easterling
@@ -16,13 +16,28 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+package hypervdisk
+
 // InjectConfig holds all the values needed for injecting files to a VHDX file.
 type InjectConfig struct {
-	ComputerName     string
-	InstallPackage   string
-	MountedDrive     string
-	StartScript      string
+	// ComputerName is the hostname to set in the injected configuration.
+	ComputerName string
+
+	// InstallPackage is the path to a package to install during installation.
+	InstallPackage string
+
+	// MountedDrive is the drive letter of the mounted VHDX (e.g. "E:").
+	MountedDrive string
+
+	// StartScript is the path to a script to run on first boot.
+	StartScript string
+
+	// UnattendTemplate is the path to the unattend.xml template file.
 	UnattendTemplate string
-	UserName         string
-	UserPassword     string
+
+	// UserName is the local account name to create.
+	UserName string
+
+	// UserPassword is the password for the local account.
+	UserPassword string
 }

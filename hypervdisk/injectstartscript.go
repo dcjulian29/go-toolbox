@@ -1,7 +1,5 @@
 //go:build windows
 
-package hypervdisk
-
 /*
 Copyright © 2026 Julian Easterling
 
@@ -18,7 +16,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+package hypervdisk
+
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -27,25 +28,36 @@ import (
 	"github.com/dcjulian29/go-toolbox/filesystem"
 )
 
-// InjectStartScript injects the startup script to the VHDX file
+// InjectStartScript copies the configured start script into the mounted VHDX,
+// replacing the {{INSTALLPACKAGE}} placeholder with the configured package path.
 func InjectStartScript(cfg *InjectConfig) error {
-	if cfg.StartScript != "" && filesystem.FileExist(cfg.StartScript) {
-		raw, err := os.ReadFile(cfg.StartScript)
-		if err != nil {
-			return fmt.Errorf("error reading start script: %w", err)
-		}
+	if cfg == nil {
+		return errors.New("inject config must not be nil")
+	}
 
-		content := strings.ReplaceAll(string(raw), "{{INSTALLPACKAGE}}", cfg.InstallPackage)
+	if strings.TrimSpace(cfg.StartScript) == "" {
+		return nil
+	}
 
-		dest := filepath.Join(cfg.MountedDrive, "Windows", "Setup", "Scripts", filepath.Base(cfg.StartScript))
+	if !filesystem.FileExist(cfg.StartScript) {
+		return fmt.Errorf("start script not found: %s", cfg.StartScript)
+	}
 
-		if err := filesystem.EnsureDirectoryExist(filepath.Dir(dest)); err != nil {
-			return fmt.Errorf("creating Scripts dir: %w", err)
-		}
+	raw, err := os.ReadFile(cfg.StartScript)
+	if err != nil {
+		return fmt.Errorf("error reading start script: %w", err)
+	}
 
-		if err := filesystem.EnsureFileExist(dest, []byte(content)); err != nil {
-			return fmt.Errorf("writing startup script: %w", err)
-		}
+	content := strings.ReplaceAll(string(raw), "{{INSTALLPACKAGE}}", cfg.InstallPackage)
+
+	dest := filepath.Join(cfg.MountedDrive, "Windows", "Setup", "Scripts", filepath.Base(cfg.StartScript))
+
+	if err := filesystem.EnsureDirectoryExist(filepath.Dir(dest)); err != nil {
+		return fmt.Errorf("creating Scripts dir: %w", err)
+	}
+
+	if err := filesystem.EnsureFileExist(dest, []byte(content)); err != nil {
+		return fmt.Errorf("writing startup script: %w", err)
 	}
 
 	return nil

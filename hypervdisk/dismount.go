@@ -1,7 +1,5 @@
 //go:build windows
 
-package hypervdisk
-
 /*
 Copyright © 2026 Julian Easterling
 
@@ -18,8 +16,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+package hypervdisk
+
 import (
+	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/dcjulian29/go-toolbox/execute"
 	"github.com/dcjulian29/go-toolbox/textformat"
@@ -27,10 +29,14 @@ import (
 
 // Dismount unmounts the VHDX at the given path.
 func Dismount(path string) error {
+	if strings.TrimSpace(path) == "" {
+		return errors.New("VHDX path must not be empty")
+	}
+
 	script := fmt.Sprintf(
-		`Dismount-VHD -Path "%s" -ErrorAction SilentlyContinue`,
+		`Dismount-VHD -Path "%s" -ErrorAction Stop`,
 		textformat.EscapeForPowerShell(path),
 	)
 
-	return execute.RunPowershell(script)
+	return execute.RunPowerShell(script)
 }
