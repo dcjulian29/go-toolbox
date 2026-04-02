@@ -18,6 +18,7 @@ package filesystem
 
 import (
 	"io/fs"
+	"os"
 	"path/filepath"
 	"strings"
 )
@@ -34,6 +35,10 @@ func FindFilesByExtension(path, extension string) ([]string, error) {
 
 	err := filepath.WalkDir(path, func(entry string, d fs.DirEntry, err error) error {
 		if err != nil {
+			return nil
+		}
+
+		if d.Type()&os.ModeSymlink != 0 {
 			return nil
 		}
 
