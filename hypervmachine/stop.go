@@ -27,31 +27,28 @@ import (
 	"github.com/dcjulian29/go-toolbox/textformat"
 )
 
-// Remove forcefully stops and removes the VM configuration from Hyper-V.
-// Associated virtual hard disks and other files are not deleted.
-func Remove(name string) error {
+// Stop stops the named virtual machine.
+func Stop(name string) error {
 	if strings.TrimSpace(name) == "" {
 		return errors.New("virtual machine name must not be empty")
 	}
 
-	if !Exist(name) {
-		return errors.New("virtual machine does not exist")
+	state, err := State(name)
+	if err != nil {
+		return err
+	}
+
+	if !strings.EqualFold(state, "Running") {
+		return fmt.Errorf("virtual machine %q is not running", name)
 	}
 
 	script := fmt.Sprintf(
-		`Stop-VM -Name "%s" -Force -TurnOff -ErrorAction SilentlyContinue`,
-		textformat.EscapeForPowerShell(name),
-	)
-
-	_ = execute.RunPowerShell(script)
-
-	script = fmt.Sprintf(
-		`Remove-VM -Name "%s" -Force -ErrorAction Stop`,
+		`Stop-VM -Name "%s" -Force -ErrorAction Stop`,
 		textformat.EscapeForPowerShell(name),
 	)
 
 	if err := execute.RunPowerShell(script); err != nil {
-		return fmt.Errorf("removing VM %q: %w", name, err)
+		return fmt.Errorf("stopping VM %q: %w", name, err)
 	}
 
 	return nil

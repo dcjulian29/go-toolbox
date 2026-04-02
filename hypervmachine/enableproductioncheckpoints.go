@@ -27,31 +27,23 @@ import (
 	"github.com/dcjulian29/go-toolbox/textformat"
 )
 
-// Remove forcefully stops and removes the VM configuration from Hyper-V.
-// Associated virtual hard disks and other files are not deleted.
-func Remove(name string) error {
+// EnableProductionCheckpoints enables production checkpoints for the VM.
+// Production checkpoints use Volume Shadow Copy Service (VSS) inside the
+// guest to create application-consistent backups without capturing memory
+// state. These are safe for domain controllers and production workloads
+// but require guest integration services to be running.
+func EnableProductionCheckpoints(name string) error {
 	if strings.TrimSpace(name) == "" {
 		return errors.New("virtual machine name must not be empty")
 	}
 
-	if !Exist(name) {
-		return errors.New("virtual machine does not exist")
-	}
-
 	script := fmt.Sprintf(
-		`Stop-VM -Name "%s" -Force -TurnOff -ErrorAction SilentlyContinue`,
-		textformat.EscapeForPowerShell(name),
-	)
-
-	_ = execute.RunPowerShell(script)
-
-	script = fmt.Sprintf(
-		`Remove-VM -Name "%s" -Force -ErrorAction Stop`,
+		`Set-VM -Name "%s" -CheckpointType Production -ErrorAction Stop`,
 		textformat.EscapeForPowerShell(name),
 	)
 
 	if err := execute.RunPowerShell(script); err != nil {
-		return fmt.Errorf("removing VM %q: %w", name, err)
+		return fmt.Errorf("enabling production checkpoints for VM %q: %w", name, err)
 	}
 
 	return nil

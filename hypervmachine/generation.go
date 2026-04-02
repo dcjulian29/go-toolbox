@@ -1,7 +1,5 @@
 //go:build windows
 
-package hypervmachine
-
 /*
 Copyright © 2026 Julian Easterling
 
@@ -18,19 +16,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import (
-	"fmt"
+package hypervmachine
 
-	"github.com/dcjulian29/go-toolbox/execute"
-	"github.com/dcjulian29/go-toolbox/textformat"
+// Generation represents a Hyper-V virtual machine generation.
+type Generation int
+
+const (
+	// GenerationV1 creates a Generation 1 VM with BIOS firmware and IDE controllers.
+	GenerationV1 Generation = 1
+	// GenerationV2 creates a Generation 2 VM with UEFI firmware and SCSI controllers.
+	GenerationV2 Generation = 2
 )
-
-// EnableCheckpoints enables standard (production) checkpoints.
-func EnableCheckpoints(name string) error {
-	script := fmt.Sprintf(
-		`Set-VM -Name "%s" -CheckpointType Standard -ErrorAction Stop`,
-		textformat.EscapeForPowerShell(name),
-	)
-
-	return execute.RunPowershell(script)
-}

@@ -1,7 +1,5 @@
 //go:build windows
 
-package hypervmachine
-
 /*
 Copyright © 2026 Julian Easterling
 
@@ -18,8 +16,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+package hypervmachine
+
 import (
+	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/dcjulian29/go-toolbox/execute"
 	"github.com/dcjulian29/go-toolbox/textformat"
@@ -27,12 +29,24 @@ import (
 
 // SetSecureBootTemplate sets the Secure Boot template (e.g. "MicrosoftUEFICertificateAuthority"
 // for Linux, "MicrosoftWindows" for Windows).
-func SetSecureBootTemplate(name, template string) error {
+func SetSecureBootTemplate(name string, template SecureBootTemplate) error {
+	if strings.TrimSpace(name) == "" {
+		return errors.New("virtual machine name must not be empty")
+	}
+
+	if !Exist(name) {
+		return errors.New("virtual machine does not exist")
+	}
+
 	script := fmt.Sprintf(
 		`Set-VMFirmware -VMName "%s" -SecureBootTemplate "%s" -ErrorAction Stop`,
 		textformat.EscapeForPowerShell(name),
-		textformat.EscapeForPowerShell(template),
+		textformat.EscapeForPowerShell(string(template)),
 	)
 
-	return execute.RunPowershell(script)
+	if err := execute.RunPowerShell(script); err != nil {
+		return fmt.Errorf("setting secure boot template for VM %q: %w", name, err)
+	}
+
+	return nil
 }

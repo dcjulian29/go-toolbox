@@ -1,7 +1,5 @@
 //go:build windows
 
-package hypervmachine
-
 /*
 Copyright © 2026 Julian Easterling
 
@@ -18,20 +16,45 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+package hypervmachine
+
 import (
+	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/dcjulian29/go-toolbox/execute"
 	"github.com/dcjulian29/go-toolbox/textformat"
 )
 
-// SetDynamicMemory enables dynamic memory with the given startup/min/max values.
-func SetDynamicMemory(name string, startBytes, minBytes, maxBytes int64) error {
+// SetDynamicMemory enables dynamic memory with the given range.
+// The startup memory is set equal to minBytes.
+func SetDynamicMemory(name string, minBytes, maxBytes int64) error {
+	if strings.TrimSpace(name) == "" {
+		return errors.New("virtual machine name must not be empty")
+	}
+
+	if !Exist(name) {
+		return errors.New("virtual machine does not exist")
+	}
+
+	if minBytes <= 0 { //nolint:revive
+		return errors.New("minimum bytes must be greater than zero")
+	}
+
+	if maxBytes <= minBytes {
+		return errors.New("maximum memory bytes must be greater than minimum memory bytes")
+	}
+
 	script := fmt.Sprintf(
 		`Set-VMMemory -VMName "%s" -DynamicMemoryEnabled $true `+
 			`-StartupBytes %d -MinimumBytes %d -MaximumBytes %d -ErrorAction Stop`,
-		textformat.EscapeForPowerShell(name), startBytes, minBytes, maxBytes,
+		textformat.EscapeForPowerShell(name), minBytes, minBytes, maxBytes,
 	)
 
-	return execute.RunPowershell(script)
+	if err := execute.RunPowerShell(script); err != nil {
+		return fmt.Errorf("setting dynamic memory for VM %q: %w", name, err)
+	}
+
+	return nil
 }

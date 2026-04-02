@@ -1,7 +1,5 @@
 //go:build windows
 
-package hypervmachine
-
 /*
 Copyright © 2026 Julian Easterling
 
@@ -18,21 +16,30 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+package hypervmachine
+
 import (
+	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/dcjulian29/go-toolbox/execute"
 	"github.com/dcjulian29/go-toolbox/textformat"
 )
 
 // DisableSecureBoot turns off Secure Boot for a Generation 2 VM.
+// Calling this on a Generation 1 VM will return an error.
 func DisableSecureBoot(name string) error {
+	if strings.TrimSpace(name) == "" {
+		return errors.New("virtual machine name must not be empty")
+	}
+
 	script := fmt.Sprintf(
 		`Set-VMFirmware -VMName "%s" -EnableSecureBoot Off -ErrorAction Stop`,
 		textformat.EscapeForPowerShell(name),
 	)
 
-	if err := execute.RunPowershell(script); err != nil {
+	if err := execute.RunPowerShell(script); err != nil {
 		return fmt.Errorf("disabling Secure Boot for VM %q: %w", name, err)
 	}
 

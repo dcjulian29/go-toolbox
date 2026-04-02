@@ -1,7 +1,5 @@
 //go:build windows
 
-package hypervmachine
-
 /*
 Copyright © 2026 Julian Easterling
 
@@ -18,8 +16,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+package hypervmachine
+
 import (
+	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/dcjulian29/go-toolbox/execute"
 	"github.com/dcjulian29/go-toolbox/textformat"
@@ -27,10 +29,18 @@ import (
 
 // DisableAutomaticCheckpoints turns off automatic checkpoints.
 func DisableAutomaticCheckpoints(name string) error {
+	if strings.TrimSpace(name) == "" {
+		return errors.New("virtual machine name must not be empty")
+	}
+
 	script := fmt.Sprintf(
 		`Set-VM -Name "%s" -AutomaticCheckpointsEnabled $false -ErrorAction Stop`,
 		textformat.EscapeForPowerShell(name),
 	)
 
-	return execute.RunPowershell(script)
+	if err := execute.RunPowerShell(script); err != nil {
+		return fmt.Errorf("disabling automatic checkpoints for VM %q: %w", name, err)
+	}
+
+	return nil
 }

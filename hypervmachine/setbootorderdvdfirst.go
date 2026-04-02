@@ -1,7 +1,5 @@
 //go:build windows
 
-package hypervmachine
-
 /*
 Copyright © 2026 Julian Easterling
 
@@ -18,24 +16,39 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+package hypervmachine
+
 import (
+	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/dcjulian29/go-toolbox/execute"
 	"github.com/dcjulian29/go-toolbox/textformat"
 )
 
-// SetBootOrderDVDFirst sets the firmware boot order so that the DVD drive is first
+// SetBootOrderDVDFirst sets the firmware boot order so that the DVD drive is first.
+// This only applies to Generation 2 VMs; Generation 1 VMs use BIOS boot order.
 func SetBootOrderDVDFirst(name string) error {
+	if strings.TrimSpace(name) == "" {
+		return errors.New("virtual machine name must not be empty")
+	}
+
+	if !Exist(name) {
+		return errors.New("virtual machine does not exist")
+	}
+
 	script := fmt.Sprintf(
-		`$vm = Get-VM -Name "%s"; `+
-			`$dvd = Get-VMDvdDrive -VMName "%s"; `+
-			`$hd  = Get-VMHardDiskDrive -VMName "%s"; `+
-			`Set-VMFirmware -VM $vm -BootOrder $dvd,$hd -ErrorAction Stop`,
-		textformat.EscapeForPowerShell(name),
-		textformat.EscapeForPowerShell(name),
+		`$n = "%s"; `+
+			`$dvd = Get-VMDvdDrive -VMName $n; `+
+			`$hd  = Get-VMHardDiskDrive -VMName $n; `+
+			`Set-VMFirmware -VMName $n -BootOrder $dvd,$hd -ErrorAction Stop`,
 		textformat.EscapeForPowerShell(name),
 	)
 
-	return execute.RunPowershell(script)
+	if err := execute.RunPowerShell(script); err != nil {
+		return fmt.Errorf("setting DVD first boot for VM %q: %w", name, err)
+	}
+
+	return nil
 }

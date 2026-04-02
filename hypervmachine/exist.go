@@ -1,7 +1,5 @@
 //go:build windows
 
-package hypervmachine
-
 /*
 Copyright © 2026 Julian Easterling
 
@@ -18,6 +16,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+package hypervmachine
+
 import (
 	"fmt"
 	"strings"
@@ -26,14 +26,18 @@ import (
 	"github.com/dcjulian29/go-toolbox/textformat"
 )
 
-// Exists returns true when a VM with that name is registered in Hyper-V.
-func Exists(name string) bool {
+// Exist returns true when a VM with that name is registered in Hyper-V.
+func Exist(name string) bool {
+	if strings.TrimSpace(name) == "" {
+		return false
+	}
+
 	script := fmt.Sprintf(
 		`(Get-VM -VMName '%s' -ErrorAction SilentlyContinue) -ne $null`,
 		textformat.EscapeForPowerShell(name),
 	)
 
-	exist, err := execute.RunPowershellCapture(script)
+	exist, err := execute.RunPowerShellCapture(script)
 
-	return err == nil && strings.EqualFold(exist, "True")
+	return err == nil && strings.EqualFold(strings.TrimSpace(exist), "True")
 }

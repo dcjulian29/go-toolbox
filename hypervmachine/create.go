@@ -1,7 +1,5 @@
 //go:build windows
 
-package hypervmachine
-
 /*
 Copyright © 2026 Julian Easterling
 
@@ -18,6 +16,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+package hypervmachine
+
 import (
 	"fmt"
 
@@ -26,14 +26,16 @@ import (
 )
 
 // Create creates a new Hyper-V virtual machine with the provided config.
-func Create(cfg Config) error {
-	if cfg.Generation == 0 { //nolint
-		cfg.Generation = 2 //nolint
+// If post-creation configuration fails, the VM may exist in a partially
+// configured state and should be removed manually.
+func Create(cfg *Config) error {
+	if err := ValidateConfig(cfg); err != nil {
+		return err
 	}
 
 	script := fmt.Sprintf(
 		`New-VM -Generation %d -Name "%s" -MemoryStartupBytes %d `+
-			`-SwitchName "%s"-VHDPath "%s" -ErrorAction Stop`,
+			`-SwitchName "%s" -VHDPath "%s" -ErrorAction Stop`,
 		cfg.Generation,
 		textformat.EscapeForPowerShell(cfg.Name),
 		cfg.MemoryBytes,
@@ -41,8 +43,26 @@ func Create(cfg Config) error {
 		textformat.EscapeForPowerShell(cfg.VHDXPath),
 	)
 
-	if err := execute.RunPowershell(script); err != nil {
+	if err := execute.RunPowerShell(script); err != nil {
 		return fmt.Errorf("creating VM %q: %w", cfg.Name, err)
+	}
+
+	if cfg.MaximumMemoryBytes != cfg.MemoryBytes {
+		if err := SetDynamicMemory(cfg.Name, cfg.MemoryBytes, cfg.MaximumMemoryBytes); err != nil {
+			return fmt.Errorf("configuring dynamic memory for VM %q: %w", cfg.Name, err)
+		}
+	}
+
+	if cfg.ProcessorCount > 0 { //nolint:revive
+		if err := SetProcessorCount(cfg.Name, cfg.ProcessorCount); err != nil {
+			return fmt.Errorf("setting processor count for VM %q: %w", cfg.Name, err)
+		}
+	}
+
+	if cfg.Generation == GenerationV2 && !cfg.SecureBoot {
+		if err := DisableSecureBoot(cfg.Name); err != nil {
+			return fmt.Errorf("disabling Secure Boot for VM %q: %w", cfg.Name, err)
+		}
 	}
 
 	return nil

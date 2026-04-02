@@ -1,7 +1,5 @@
 //go:build windows
 
-package hypervmachine
-
 /*
 Copyright © 2026 Julian Easterling
 
@@ -18,16 +16,28 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+package hypervmachine
+
 import (
+	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/dcjulian29/go-toolbox/execute"
 	"github.com/dcjulian29/go-toolbox/textformat"
 )
 
-// State returns the current state string ("Running", "Off", "Saved", ...).
+// State returns the current state of a virtual machine ("Running", "Off", "Saved", ...).
 func State(name string) (string, error) {
+	if strings.TrimSpace(name) == "" {
+		return textformat.EmptyString, errors.New("virtual machine name must not be empty")
+	}
+
+	if !Exist(name) {
+		return textformat.EmptyString, errors.New("virtual machine does not exist")
+	}
+
 	script := fmt.Sprintf(`(Get-VM -VMName '%s').State`, textformat.EscapeForPowerShell(name))
 
-	return execute.RunPowershellCapture(script)
+	return execute.RunPowerShellCapture(script)
 }

@@ -1,7 +1,5 @@
 //go:build windows
 
-package hypervmachine
-
 /*
 Copyright © 2026 Julian Easterling
 
@@ -18,8 +16,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+package hypervmachine
+
 import (
+	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/dcjulian29/go-toolbox/execute"
 	"github.com/dcjulian29/go-toolbox/textformat"
@@ -27,10 +29,26 @@ import (
 
 // SetProcessorCount sets the number of virtual processors on an existing VM.
 func SetProcessorCount(name string, count int) error {
+	if strings.TrimSpace(name) == "" {
+		return errors.New("virtual machine name must not be empty")
+	}
+
+	if !Exist(name) {
+		return errors.New("virtual machine does not exist")
+	}
+
+	if count < 1 { //nolint:revive
+		return errors.New("processor count must be greater than zero")
+	}
+
 	script := fmt.Sprintf(
 		`Set-VMProcessor -VMName "%s" -Count %d -ErrorAction Stop`,
 		textformat.EscapeForPowerShell(name), count,
 	)
 
-	return execute.RunPowershell(script)
+	if err := execute.RunPowerShell(script); err != nil {
+		return fmt.Errorf("setting processor count for VM %q: %w", name, err)
+	}
+
+	return nil
 }

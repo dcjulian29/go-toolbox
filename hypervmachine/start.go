@@ -1,7 +1,5 @@
 //go:build windows
 
-package hypervmachine
-
 /*
 Copyright © 2026 Julian Easterling
 
@@ -18,8 +16,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+package hypervmachine
+
 import (
+	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/dcjulian29/go-toolbox/execute"
 	"github.com/dcjulian29/go-toolbox/textformat"
@@ -27,9 +29,22 @@ import (
 
 // Start starts the named virtual machine.
 func Start(name string) error {
+	if strings.TrimSpace(name) == "" {
+		return errors.New("virtual machine name must not be empty")
+	}
+
+	state, err := State(name)
+	if err != nil {
+		return err
+	}
+
+	if strings.EqualFold(state, "Running") {
+		return fmt.Errorf("virtual machine %q is already started", name)
+	}
+
 	script := fmt.Sprintf(`Start-VM -Name "%s" -ErrorAction Stop`, textformat.EscapeForPowerShell(name))
 
-	if err := execute.RunPowershell(script); err != nil {
+	if err := execute.RunPowerShell(script); err != nil {
 		return fmt.Errorf("starting VM %q: %w", name, err)
 	}
 

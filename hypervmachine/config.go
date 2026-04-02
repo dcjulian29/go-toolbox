@@ -1,4 +1,4 @@
-package hypervmachine
+//go:build windows
 
 /*
 Copyright © 2026 Julian Easterling
@@ -16,14 +16,27 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+package hypervmachine
+
 // Config holds the parameters used when creating a Hyper-V VM.
 type Config struct {
-	Name               string
-	VHDXPath           string
-	VirtualSwitch      string
+	// Name is the display name of the VM in Hyper-V.
+	Name string
+	// VHDXPath is the full path to the VM's virtual hard disk.
+	VHDXPath string
+	// VirtualSwitch is the name of the Hyper-V virtual switch to connect.
+	VirtualSwitch string
+	// MemoryBytes is the startup memory size in bytes. When dynamic memory is
+	// enabled, this value is also used as the minimum memory allocation.
+	MemoryBytes int64
+	// MaximumMemoryBytes is the upper bound for dynamic memory allocation.
+	// Must be greater than or equal to MemoryBytes. When set equal to
+	// MemoryBytes, the VM uses static (fixed) memory.
 	MaximumMemoryBytes int64
-	MemoryBytes        int64
-	ProcessorCount     int
-	Generation         int  // 1 or 2
-	SecureBoot         bool // only relevant for Generation 2
+	// ProcessorCount is the number of virtual CPUs assigned to the VM.
+	ProcessorCount int
+	// Generation is the VM generation. Use GenerationV1 or GenerationV2.
+	Generation Generation
+	// SecureBoot enables Secure Boot (only relevant for GenerationV2).
+	SecureBoot bool
 }
