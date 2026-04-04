@@ -19,6 +19,7 @@ package filesystem
 import (
 	"os"
 	"path/filepath"
+	"runtime"
 	"testing"
 )
 
@@ -29,9 +30,10 @@ func TestExpandHome(t *testing.T) {
 	}
 
 	tests := []struct {
-		name  string
-		input string
-		want  string
+		name   string
+		input  string
+		want   string
+		onlyOS string // if set, skip this case on any other GOOS
 	}{
 		// ── Unix-style prefix ─────────────────────────────────────────────
 		{
@@ -45,21 +47,26 @@ func TestExpandHome(t *testing.T) {
 			want:  filepath.Join(home, "a", "b", "c"),
 		},
 		{
-			name:  "unix tilde-slash prefix with no suffix path component",
+			name:  "unix tilde-slash with no suffix path component",
 			input: "~/",
 			want:  filepath.Join(home, ""),
 		},
 
-		// ── Windows-style prefix ──────────────────────────────────────────
+		// ── Windows-style prefix — only valid on Windows ──────────────────
+		// On Linux/macOS the backslash is a legal filename character, not a
+		// separator, so filepath.Join treats the entire suffix as one component.
+		// These cases are therefore only meaningful on Windows.
 		{
-			name:  "windows tilde-backslash prefix expands to home",
-			input: `~\documents`,
-			want:  filepath.Join(home, "documents"),
+			name:   "windows tilde-backslash prefix expands to home",
+			input:  `~\documents`,
+			want:   filepath.Join(home, "documents"),
+			onlyOS: "windows",
 		},
 		{
-			name:  "windows tilde-backslash prefix with nested path",
-			input: `~\a\b\c`,
-			want:  filepath.Join(home, "a", "b", "c"),
+			name:   "windows tilde-backslash prefix with nested path",
+			input:  `~\a\b\c`,
+			want:   filepath.Join(home, "a", "b", "c"),
+			onlyOS: "windows",
 		},
 
 		// ── No expansion expected ─────────────────────────────────────────
@@ -102,6 +109,61 @@ func TestExpandHome(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
+			if tc.onlyOS != "" && runtime.GOOS != tc.onlyOS {
+				t.Skipf("skipping %q: backslash is not a path separator on %s", tc.name, runtime.GOOS)
+			}
+
+			got := ExpandHome(tc.input)
+
+			if got != tc.want {
+				t.Errorf("ExpandHome(%q)\n  got:  %q\n  want: %q", tc.input, got, tc.want)
+			}
+		})
+	}
+}
+
+// TestExpandHome_BackslashOnLinux documents the exact behavior of ExpandHome
+// when given a Windows-style tilde path on a non-Windows platform.
+//
+// Because backslash is a valid filename character on Linux/macOS, the suffix
+// after "~\" is treated as a single path component rather than a hierarchy of
+// directories. This is a known limitation of the cross-platform implementation
+// and this test locks in that documented behavior.
+func TestExpandHome_BackslashOnLinux(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("not applicable on Windows — backslash is a real separator there")
+	}
+
+	home, err := os.UserHomeDir()
+	if err != nil {
+		t.Fatalf("could not determine home directory: %v", err)
+	}
+
+	tests := []struct {
+		name  string
+		input string
+		// On Linux the suffix after ~\ is ONE component (backslash is not a separator).
+		want string
+	}{
+		{
+			name:  "tilde-backslash suffix is one component on Linux",
+			input: `~\documents`,
+			// filepath.Join(home, `documents`) — only one level deep because
+			// the backslash prefix is consumed by path[:2] but the rest is a
+			// plain string with no OS path separator.
+			want: filepath.Join(home, `documents`),
+		},
+		{
+			name:  "tilde-backslash nested path is one opaque component on Linux",
+			input: `~\a\b\c`,
+			// filepath.Join(home, `a\b\c`) — the backslashes are literal
+			// characters inside the single filename "a\b\c".
+			want: filepath.Join(home, `a\b\c`),
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
 			got := ExpandHome(tc.input)
 			if got != tc.want {
 				t.Errorf("ExpandHome(%q)\n  got:  %q\n  want: %q", tc.input, got, tc.want)
@@ -112,8 +174,6 @@ func TestExpandHome(t *testing.T) {
 
 // TestExpandHome_HomeEnvUnset verifies that ExpandHome returns the original
 // path unchanged when the operating system cannot resolve the home directory.
-// We simulate this by unsetting both HOME and USERPROFILE before the call and
-// restoring them afterwards.
 func TestExpandHome_HomeEnvUnset(t *testing.T) {
 	origHome := os.Getenv("HOME")
 	origUserProf := os.Getenv("USERPROFILE")
@@ -126,11 +186,10 @@ func TestExpandHome_HomeEnvUnset(t *testing.T) {
 	_ = os.Unsetenv("HOME")
 	_ = os.Unsetenv("USERPROFILE")
 
-	// os.UserHomeDir() will now fail on most platforms.
-	// If it still succeeds (e.g. via /etc/passwd), skip the test rather than
-	// report a false failure.
+	// If os.UserHomeDir() still resolves (e.g. via /etc/passwd on Linux),
+	// the error path cannot be triggered — skip gracefully.
 	if _, err := os.UserHomeDir(); err == nil {
-		t.Skip("os.UserHomeDir() succeeded even without HOME/USERPROFILE; skipping unset test")
+		t.Skip("os.UserHomeDir() succeeded without HOME/USERPROFILE; skipping unset test")
 	}
 
 	input := "~/documents"
