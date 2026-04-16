@@ -24,12 +24,13 @@ import (
 // ExpandHome prefixes the provided path to the user's home directory as defined
 // by the operating system.
 func ExpandHome(path string) string {
-	if len(path) >= 2 {
-		if path[:2] == "~\\" || path[:2] == "~/" {
+	if len(path) >= 2 { //nolint:revive
+		if path[:2] == "~\\" || path[:2] == "~/" { //nolint:revive
 			home, err := os.UserHomeDir()
 			if err != nil {
 				return path
 			}
+
 			return filepath.Join(home, path[2:])
 		}
 	}
