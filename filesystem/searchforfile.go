@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"slices"
 
 	"github.com/dcjulian29/go-toolbox/textformat"
 )
@@ -40,14 +41,14 @@ func SearchForFile(path, pattern string) (string, error) {
 
 	var last string
 
-	for i := len(matches) - 1; i >= 0; i-- { //nolint:revive
-		info, err := os.Stat(matches[i])
+	for _, m := range slices.Backward(matches) {
+		info, err := os.Stat(m)
 		if err != nil {
 			continue
 		}
 
 		if !info.IsDir() {
-			last = matches[i]
+			last = m
 
 			break
 		}

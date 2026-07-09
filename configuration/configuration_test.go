@@ -25,8 +25,8 @@ import (
 
 type testConfig struct {
 	Name  string   `yaml:"name"`
-	Count int      `yaml:"count"`
 	Items []string `yaml:"items"`
+	Count int      `yaml:"count"`
 }
 
 // setHome points the user's home directory at a fresh temp dir for the duration
@@ -51,7 +51,7 @@ func writeConfig(t *testing.T, home, name, content string) string {
 		t.Fatalf("setup: %v", err)
 	}
 
-	if err := os.WriteFile(path, []byte(content), 0o644); err != nil {
+	if err := os.WriteFile(path, []byte(content), 0o600); err != nil {
 		t.Fatalf("setup: %v", err)
 	}
 

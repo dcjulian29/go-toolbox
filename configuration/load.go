@@ -31,7 +31,7 @@ import (
 // the process restarts (or [File.Save] replaces the cache).
 func (f *File[T]) Load() (T, error) {
 	f.once.Do(func() {
-		cfg, err := f.load()
+		cfg, err := f.loadFromDisk()
 
 		f.mutex.Lock()
 		f.instance = cfg
@@ -45,7 +45,7 @@ func (f *File[T]) Load() (T, error) {
 	return *f.instance, f.loadErr
 }
 
-func (f *File[T]) load() (*T, error) {
+func (f *File[T]) loadFromDisk() (*T, error) {
 	cfg := new(T)
 
 	path, err := f.Path()

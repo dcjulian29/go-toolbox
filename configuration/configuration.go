@@ -42,9 +42,9 @@ import (
 // are described by the caller-supplied type T. A File is safe for concurrent
 // use. Create one per configuration file with [New].
 type File[T any] struct {
-	name     string
-	instance *T
 	loadErr  error
+	instance *T
+	name     string
 	once     sync.Once
 	mutex    sync.RWMutex
 }
