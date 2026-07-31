@@ -1,6 +1,6 @@
 module github.com/dcjulian29/go-toolbox
 
-go 1.25.0
+go 1.26.5
 
 require golang.org/x/sys v0.47.0
 
