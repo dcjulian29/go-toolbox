@@ -87,7 +87,9 @@ type ContainerOptions struct {
 	Keep bool
 
 	// NoTty disables pseudo-TTY allocation, equivalent to omitting
-	// docker run --tty. Only applies when Interactive is true.
+	// docker run --tty. Only applies when Interactive is true. A pseudo-TTY is
+	// also omitted automatically when standard input is not a terminal, so this
+	// only needs to be set to suppress one that would otherwise be allocated.
 	NoTty bool
 
 	// ReadOnly mounts the container's root filesystem as read-only, equivalent

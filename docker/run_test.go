@@ -25,6 +25,18 @@ import (
 	"github.com/dcjulian29/go-toolbox/textformat"
 )
 
+// stubStdinIsTerminal replaces the terminal detection for the duration of a
+// test so the expected arguments do not depend on how the test runner was
+// invoked.
+func stubStdinIsTerminal(t *testing.T, terminal bool) {
+	t.Helper()
+
+	original := stdinIsTerminal
+	stdinIsTerminal = func() bool { return terminal }
+
+	t.Cleanup(func() { stdinIsTerminal = original })
+}
+
 func TestInteractiveArguments_Detached(t *testing.T) {
 	opts := ContainerOptions{Interactive: false}
 
@@ -36,6 +48,8 @@ func TestInteractiveArguments_Detached(t *testing.T) {
 }
 
 func TestInteractiveArguments_InteractiveWithTty(t *testing.T) {
+	stubStdinIsTerminal(t, true)
+
 	opts := ContainerOptions{Interactive: true}
 
 	args := interactiveArguments(opts)
@@ -46,7 +60,21 @@ func TestInteractiveArguments_InteractiveWithTty(t *testing.T) {
 }
 
 func TestInteractiveArguments_InteractiveWithoutTty(t *testing.T) {
+	stubStdinIsTerminal(t, true)
+
 	opts := ContainerOptions{Interactive: true, NoTty: true}
+
+	args := interactiveArguments(opts)
+
+	if len(args) != 1 || args[0] != "--interactive" {
+		t.Errorf("got %v, want [--interactive]", args)
+	}
+}
+
+func TestInteractiveArguments_InteractiveWhenStdinIsNotTerminal(t *testing.T) {
+	stubStdinIsTerminal(t, false)
+
+	opts := ContainerOptions{Interactive: true}
 
 	args := interactiveArguments(opts)
 

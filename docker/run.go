@@ -25,6 +25,7 @@ import (
 	"github.com/dcjulian29/go-toolbox/execute"
 	"github.com/dcjulian29/go-toolbox/filesystem"
 	"github.com/dcjulian29/go-toolbox/textformat"
+	"golang.org/x/term"
 )
 
 // Run builds and executes a docker run command from the provided options.
@@ -149,12 +150,25 @@ func environmentArguments(opts ContainerOptions) []string {
 	return args
 }
 
+// stdinIsTerminal reports whether standard input is attached to a terminal.
+// It is a variable so tests can replace it with a deterministic stub.
+//
+// Checking os.ModeCharDevice is not sufficient: the null device is also a
+// character device, so redirecting from /dev/null (or NUL on Windows) would
+// otherwise be mistaken for a terminal.
+var stdinIsTerminal = func() bool {
+	return term.IsTerminal(int(os.Stdin.Fd()))
+}
+
 func interactiveArguments(opts ContainerOptions) []string {
 	if !opts.Interactive {
 		return []string{"--detach"}
 	}
 
-	if opts.NoTty {
+	// Docker refuses to start when --tty is requested but stdin is not a
+	// terminal, so only allocate one when the host actually has a terminal
+	// attached. This keeps the same binary usable from a shell, a pipe, and CI.
+	if opts.NoTty || !stdinIsTerminal() {
 		return []string{"--interactive"}
 	}
 
