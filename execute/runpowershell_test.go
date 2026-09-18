@@ -100,8 +100,7 @@ func TestRunPowerShell_NonZeroExit(t *testing.T) {
 		t.Fatal("expected error for non-zero exit")
 	}
 
-	var exitErr *exec.ExitError
-	if !errors.As(err, &exitErr) {
+	if _, ok := errors.AsType[*exec.ExitError](err); !ok {
 		t.Errorf("expected *exec.ExitError, got %T: %v", err, err)
 	}
 }

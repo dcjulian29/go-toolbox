@@ -83,8 +83,7 @@ func TestExternalProgramCapture_ProgramNotFound(t *testing.T) {
 		t.Errorf("expected empty output on error, got %q", got)
 	}
 
-	var execErr *exec.Error
-	if !errors.As(err, &execErr) {
+	if _, ok := errors.AsType[*exec.Error](err); !ok {
 		t.Errorf("expected *exec.Error, got %T: %v", err, err)
 	}
 }
@@ -107,8 +106,7 @@ func TestExternalProgramCapture_NonZeroExit(t *testing.T) {
 		t.Errorf("expected empty output on error, got %q", got)
 	}
 
-	var exitErr *exec.ExitError
-	if !errors.As(err, &exitErr) {
+	if _, ok := errors.AsType[*exec.ExitError](err); !ok {
 		t.Errorf("expected *exec.ExitError, got %T: %v", err, err)
 	}
 }
