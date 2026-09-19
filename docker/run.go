@@ -49,7 +49,12 @@ func Run(opts ContainerOptions) (string, error) {
 	opts.Volumes = append(opts.Volumes, entryVol...)
 
 	args := []string{"run"}
-	args = append(args, interactiveArguments(opts)...)
+	// Checking os.ModeCharDevice is not sufficient: the null device is also a
+	// character device, so redirecting from /dev/null (or NUL on Windows) would
+	// otherwise be mistaken for a terminal.
+	args = append(args, interactiveArguments(opts, func() bool {
+		return term.IsTerminal(int(os.Stdin.Fd()))
+	})...)
 	args = append(args, containerArguments(opts)...)
 	args = append(args, entryArgs...)
 	args = append(args, environmentArguments(opts)...)
@@ -150,17 +155,7 @@ func environmentArguments(opts ContainerOptions) []string {
 	return args
 }
 
-// stdinIsTerminal reports whether standard input is attached to a terminal.
-// It is a variable so tests can replace it with a deterministic stub.
-//
-// Checking os.ModeCharDevice is not sufficient: the null device is also a
-// character device, so redirecting from /dev/null (or NUL on Windows) would
-// otherwise be mistaken for a terminal.
-var stdinIsTerminal = func() bool {
-	return term.IsTerminal(int(os.Stdin.Fd()))
-}
-
-func interactiveArguments(opts ContainerOptions) []string {
+func interactiveArguments(opts ContainerOptions, isTerminal func() bool) []string {
 	if !opts.Interactive {
 		return []string{"--detach"}
 	}
@@ -168,7 +163,7 @@ func interactiveArguments(opts ContainerOptions) []string {
 	// Docker refuses to start when --tty is requested but stdin is not a
 	// terminal, so only allocate one when the host actually has a terminal
 	// attached. This keeps the same binary usable from a shell, a pipe, and CI.
-	if opts.NoTty || !stdinIsTerminal() {
+	if opts.NoTty || !isTerminal() {
 		return []string{"--interactive"}
 	}
 
