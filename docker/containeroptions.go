@@ -30,6 +30,12 @@ type ContainerOptions struct {
 	// to docker run --user. Accepts the format <name|uid>[:<group|gid>].
 	User string
 
+	// Groups adds supplementary groups for the container's user, equivalent to
+	// docker run --group-add for each entry. Accepts group names or GIDs. Useful
+	// for granting access to a mounted socket, such as Docker's, whose group the
+	// image's user is not otherwise in.
+	Groups []string
+
 	// Command overrides the default command (CMD) defined in the image.
 	Command string
 
