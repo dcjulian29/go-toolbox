@@ -107,6 +107,10 @@ func containerArguments(opts ContainerOptions) []string {
 		args = append(args, "--user", opts.User)
 	}
 
+	for _, group := range opts.Groups {
+		args = append(args, "--group-add", group)
+	}
+
 	if opts.WorkingDirectory != textformat.EmptyString {
 		args = append(args, "--workdir", opts.WorkingDirectory)
 	}

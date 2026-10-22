@@ -77,6 +77,7 @@ func TestContainerArguments_AllFields(t *testing.T) {
 		Name:             "mycontainer",
 		ReadOnly:         true,
 		User:             "1000:1000",
+		Groups:           []string{"0", "docker"},
 		WorkingDirectory: "/app",
 	}
 
@@ -88,6 +89,8 @@ func TestContainerArguments_AllFields(t *testing.T) {
 		"--name", "mycontainer",
 		"--read-only",
 		"--user", "1000:1000",
+		"--group-add", "0",
+		"--group-add", "docker",
 		"--workdir", "/app",
 	}
 
