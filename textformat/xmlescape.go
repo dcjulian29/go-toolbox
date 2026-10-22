@@ -31,26 +31,26 @@ func XMLEscape(s string) string {
 		case '&':
 			if isXMLEntity(s[i:]) {
 				end := strings.IndexByte(s[i:], ';')
-				b.WriteString(s[i : i+end+1])
+				_, _ = b.WriteString(s[i : i+end+1])
 				i += end
 			} else {
-				b.WriteString("&amp;")
+				_, _ = b.WriteString("&amp;")
 			}
 
 		case '<':
-			b.WriteString("&lt;")
+			_, _ = b.WriteString("&lt;")
 
 		case '>':
-			b.WriteString("&gt;")
+			_, _ = b.WriteString("&gt;")
 
 		case '"':
-			b.WriteString("&quot;")
+			_, _ = b.WriteString("&quot;")
 
 		case '\'':
-			b.WriteString("&apos;")
+			_, _ = b.WriteString("&apos;")
 
 		default:
-			b.WriteByte(s[i])
+			_ = b.WriteByte(s[i])
 		}
 	}
 

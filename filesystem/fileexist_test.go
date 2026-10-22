@@ -143,7 +143,7 @@ func TestFileExist_ReturnsFalseForBrokenSymlink(t *testing.T) {
 	}
 
 	// Remove the target so the symlink is now broken
-	os.Remove(target)
+	_ = os.Remove(target)
 
 	if FileExist(linkPath) {
 		t.Errorf("FileExist(%q) = true; expected false (broken symlink)", linkPath)
@@ -178,7 +178,7 @@ func TestFileExist_DoesNotPanicOnPermissionError(t *testing.T) {
 	}
 
 	t.Cleanup(func() {
-		os.Chmod(restricted, 0o755) //nolint:errcheck
+		_ = os.Chmod(restricted, 0o755)
 	})
 
 	// Should return false without panicking

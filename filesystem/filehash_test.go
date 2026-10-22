@@ -143,7 +143,7 @@ func TestFileHash_PermissionDenied(t *testing.T) {
 	}
 
 	t.Cleanup(func() {
-		os.Chmod(filePath, FileModeReadable) //nolint:errcheck
+		_ = os.Chmod(filePath, FileModeReadable)
 	})
 
 	_, err := FileHash(filePath)
