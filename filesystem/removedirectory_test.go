@@ -176,7 +176,7 @@ func TestRemoveDirectory_StatPermissionError(t *testing.T) {
 	}
 
 	t.Cleanup(func() {
-		os.Chmod(restricted, 0o755) //nolint:errcheck
+		_ = os.Chmod(restricted, 0o755)
 	})
 
 	err := RemoveDirectory(inner)
@@ -211,7 +211,7 @@ func TestRemoveDirectory_RemovalPermissionDenied(t *testing.T) {
 	}
 
 	t.Cleanup(func() {
-		os.Chmod(dir, 0o755) //nolint:errcheck
+		_ = os.Chmod(dir, 0o755)
 	})
 
 	err := RemoveDirectory(target)

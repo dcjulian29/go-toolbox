@@ -156,7 +156,7 @@ func TestEnsureDirectoryExist_ReturnsErrorWhenParentNotWritable(t *testing.T) {
 	}
 
 	t.Cleanup(func() {
-		os.Chmod(locked, 0o755) //nolint:errcheck
+		_ = os.Chmod(locked, 0o755)
 	})
 
 	target := filepath.Join(locked, "subdir")
@@ -210,7 +210,7 @@ func TestEnsureDirectoryExist_ReturnsErrorOnStatPermissionError(t *testing.T) {
 	}
 
 	t.Cleanup(func() {
-		os.Chmod(restricted, 0o755) //nolint:errcheck
+		_ = os.Chmod(restricted, 0o755)
 	})
 
 	err := EnsureDirectoryExist(innerDir)

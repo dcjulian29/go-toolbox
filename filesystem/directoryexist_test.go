@@ -161,7 +161,7 @@ func TestDirectoryExist_DoesNotPanicOnPermissionError(t *testing.T) {
 
 	// Restore permissions on cleanup so t.TempDir() can remove it
 	t.Cleanup(func() {
-		os.Chmod(restricted, 0o755) //nolint:errcheck
+		_ = os.Chmod(restricted, 0o755)
 	})
 
 	// This should return false without panicking

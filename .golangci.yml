@@ -84,6 +84,10 @@ linters:
     revive:
       enable-all-rules: true
       rules:
+        # Naming every literal (0, 1, "/") makes the code harder to read, not
+        # easier. golangci-lint v2.15.0's revive started flagging these.
+        - name: add-constant
+          disabled: true
         - name: cognitive-complexity
           arguments:
             - 15
