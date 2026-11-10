@@ -2,7 +2,7 @@ module github.com/dcjulian29/go-toolbox
 
 go 1.26.5
 
-require golang.org/x/sys v0.49.0
+require golang.org/x/sys v0.50.0
 
 require (
 	golang.org/x/term v0.47.0
